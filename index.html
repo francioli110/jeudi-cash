@@ -3595,38 +3595,46 @@ function scheduleRender(fn, delay = 150) {
 // ── Fonction universelle PDF — fonctionne iOS Safari + Android + Desktop ──
 function ouvrirPDF(html, filename) {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-  if (isIOS || isSafari) {
-    // iOS/Safari — téléchargement direct en HTML (ouvrable et imprimable)
-    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = (filename || 'jeudi-cash') + '.html';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 3000);
-    toast('📄 Fichier téléchargé ! Ouvre-le dans Safari → Partager → Imprimer');
+  if (isIOS) {
+    // iOS — ouvrir dans la même fenêtre pour imprimer
+    const printWin = document.createElement('iframe');
+    printWin.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:99999;background:#fff';
+    document.body.appendChild(printWin);
+    printWin.contentDocument.open();
+    printWin.contentDocument.write(html);
+    printWin.contentDocument.close();
+
+    // Bouton fermer
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Fermer';
+    closeBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:100000;background:#EF4444;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:16px;font-weight:700;cursor:pointer';
+    closeBtn.onclick = () => { document.body.removeChild(printWin); document.body.removeChild(closeBtn); };
+    document.body.appendChild(closeBtn);
+
+    // Lancer l'impression après chargement
+    setTimeout(() => {
+      printWin.contentWindow.focus();
+      printWin.contentWindow.print();
+    }, 800);
+
+    toast('📄 Appuie sur Partager → Enregistrer en PDF');
   } else {
-    // Desktop / Android Chrome — ouvrir dans un nouvel onglet
+    // Desktop / Android — nouvel onglet
     const win = window.open('', '_blank', 'width=950,height=800');
     if (win) {
       win.document.write(html);
       win.document.close();
-      toast('📄 PDF ouvert — Ctrl+P pour imprimer / sauvegarder');
+      toast('📄 PDF ouvert — Ctrl+P pour imprimer');
     } else {
-      // Fallback si pop-up bloqué
+      // Fallback téléchargement
       const blob = new Blob([html], {type:'text/html;charset=utf-8'});
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
-      a.href     = url;
-      a.download = (filename || 'jeudi-cash') + '.html';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 3000);
-      toast('📄 Fichier téléchargé — autorise les pop-ups pour un meilleur rendu');
+      a.href = url; a.download = (filename||'jeudi-cash')+'.html';
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 2000);
+      toast('📄 Fichier téléchargé');
     }
   }
 }
