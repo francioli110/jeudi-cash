@@ -163,6 +163,13 @@ body::after{
 .session-name{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;flex:1;}
 .session-logout{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 14px;background:none;border:1px solid var(--b1);color:var(--t3);border-radius:8px;cursor:pointer;transition:all .2s;}
 .session-logout:hover{border-color:var(--red);color:var(--red);}
+.session-cfg-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:6px 12px;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);color:var(--gold);border-radius:8px;cursor:pointer;transition:all .2s;}
+.session-cfg-btn:hover{background:rgba(240,180,41,.15);border-color:var(--gold);}
+/* Mobile-only config modal */
+#mobile-cfg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:flex-end;padding:0;backdrop-filter:blur(6px);}
+#mobile-cfg-overlay.open{display:flex;}
+#mobile-cfg-box{background:var(--s1);border:1px solid var(--b1);border-radius:20px 20px 0 0;padding:28px 20px 36px;width:100%;max-height:80vh;overflow-y:auto;}
+#mobile-cfg-box::-webkit-scrollbar{display:none;}
 
 /* ── LAYOUT ── */
 .container{max-width:1000px;margin:0 auto;padding:20px 14px 90px;position:relative;z-index:1;}
@@ -263,17 +270,18 @@ h1{
   position:fixed;bottom:0;left:0;right:0;z-index:200;
   background:rgba(10,10,10,.97);
   border-top:1px solid var(--b2);
-  padding:8px 8px calc(10px + env(safe-area-inset-bottom));
-  grid-template-columns:repeat(8,1fr);
-  gap:2px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  padding:8px 4px calc(10px + env(safe-area-inset-bottom));
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  gap:0;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   box-shadow:0 -4px 30px rgba(0,0,0,.5);
 }
 .bn-item{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:3px;padding:6px 2px;border-radius:10px;cursor:pointer;
   border:none;background:none;color:var(--t3);
-  transition:all .25s cubic-bezier(.34,1.56,.64,1);min-width:0;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);min-width:58px;flex-shrink:0;
 }
+.bottom-nav::-webkit-scrollbar{display:none;}
 .bn-item.active{
   color:var(--gold);
   background:rgba(240,180,41,.08);
@@ -812,7 +820,7 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
 /* ══ RESPONSIVE ══ */
 @media(max-width:768px){
   .tabs{display:none !important;}
-  .bottom-nav{display:grid !important;}
+  .bottom-nav{display:flex !important;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .container{padding:10px 12px calc(90px + env(safe-area-inset-bottom));}
 
   /* Header ultra compact */
@@ -877,14 +885,14 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
   .swap-grid{grid-template-columns:1fr !important;}
   .swap-arrow{transform:rotate(90deg);}
 
-  /* Bottom nav */
-  .bottom-nav{grid-template-columns:repeat(8,1fr);}
+  /* Bottom nav — scroll horizontal si > 6 items visibles */
+  .bottom-nav::-webkit-scrollbar{display:none;}
 }
 
 @media(max-width:480px){
   .stats{grid-template-columns:repeat(3,1fr);gap:5px;}
   h1{font-size:clamp(32px,9vw,46px) !important;}
-  .bottom-nav{grid-template-columns:repeat(8,1fr);}
+  .bn-item{min-width:52px;}
   .bn-label{font-size:6px;}
   .bn-icon{font-size:18px;}
 }
@@ -948,6 +956,7 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
   <span class="session-role-badge" id="sess-badge">—</span>
   <span class="session-name" id="sess-name">—</span>
   <span id="sync-status">✅ Synchronisé</span>
+  <button class="session-cfg-btn" id="btn-mobile-cfg" onclick="openMobileConfig()" title="Configuration" style="display:none">⚙️ Config</button>
   <button class="session-logout" onclick="doLogout()">🚪 Déconnexion</button>
 </div>
 
@@ -2255,6 +2264,31 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
 </div><!-- /container -->
 </div><!-- /main-app -->
 
+<!-- ══ MODAL CONFIG MOBILE (propriétaire uniquement) ══ -->
+<div id="mobile-cfg-overlay" onclick="if(event.target===this)closeMobileConfig()">
+  <div id="mobile-cfg-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);letter-spacing:3px;">⚙️ CONFIGURATION</div>
+      <button onclick="closeMobileConfig()" style="background:none;border:1px solid var(--b1);color:var(--t3);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:16px;transition:all .2s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--b1)';this.style.color='var(--t3)'">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px;">💰 Cotisation par semaine</label>
+        <input type="number" id="mcfg-cot" min="0" step="any" placeholder="Ex: 200" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:13px 14px;color:var(--t1);font-family:'DM Mono',monospace;font-size:16px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--b1)'">
+      </div>
+      <div>
+        <label style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px;">🏷️ Devise</label>
+        <input type="text" id="mcfg-devise" maxlength="8" placeholder="Ex: $ CAD" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:13px 14px;color:var(--t1);font-family:'DM Mono',monospace;font-size:16px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--b1)'">
+      </div>
+      <div>
+        <label style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px;">📅 Date du premier jeudi</label>
+        <input type="date" id="mcfg-date" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:13px 14px;color:var(--t1);font-family:'DM Mono',monospace;font-size:16px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--b1)'">
+      </div>
+      <button onclick="applyMobileConfig()" style="width:100%;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:18px;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--gold-light),var(--gold-dark));color:var(--bg);cursor:pointer;margin-top:4px;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">✅ APPLIQUER</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODAL MEMBRE ══ -->
 <div class="modal-overlay" id="member-modal" style="display:none" onclick="closeModalOutside(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -2464,9 +2498,13 @@ function showLoginError(msg) {
 function applyRolePermissions() {
   const p = PERMISSIONS[currentRole] || {};
 
-  // ── Config bar ──
+  // ── Config bar (desktop) ──
   const cfgBar = document.getElementById('cfg-bar');
   if (cfgBar) cfgBar.style.display = currentRole==='owner' ? 'flex' : 'none';
+
+  // ── Bouton config mobile (propriétaire uniquement) ──
+  const mobileCfgBtn = document.getElementById('btn-mobile-cfg');
+  if (mobileCfgBtn) mobileCfgBtn.style.display = currentRole==='owner' ? '' : 'none';
 
   // ── Onglet Gestion ──
   const tabOwner = document.getElementById('tab-owner-btn');
@@ -3683,6 +3721,40 @@ function init() {
 // ═══════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════
+// ─── Mobile Config Modal ───
+function openMobileConfig() {
+  const overlay = document.getElementById('mobile-cfg-overlay');
+  if (!overlay) return;
+  document.getElementById('mcfg-cot').value   = COTISATION;
+  document.getElementById('mcfg-devise').value = DEVISE;
+  document.getElementById('mcfg-date').value   = startDate || '';
+  overlay.classList.add('open');
+}
+function closeMobileConfig() {
+  const overlay = document.getElementById('mobile-cfg-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+function applyMobileConfig() {
+  const nc  = parseFloat(document.getElementById('mcfg-cot').value);
+  const nd  = document.getElementById('mcfg-devise').value.trim();
+  const ndt = document.getElementById('mcfg-date').value;
+  if (isNaN(nc) || nc <= 0) { toast('⚠️ Cotisation invalide', true); return; }
+  if (!nd) { toast('⚠️ Devise invalide', true); return; }
+  // Synchroniser avec les champs du formulaire principal (desktop)
+  const cotEl  = document.getElementById('cfg-cot');
+  const devEl  = document.getElementById('cfg-devise');
+  const dateEl = document.getElementById('cfg-date');
+  if (cotEl)  cotEl.value  = nc;
+  if (devEl)  devEl.value  = nd;
+  if (dateEl && ndt) dateEl.value = ndt;
+  COTISATION = nc; DEVISE = nd; if (ndt) startDate = ndt;
+  ls('jc2_cot', COTISATION); ls('jc2_devise', DEVISE); ls('jc2_start', startDate);
+  rebuildSchedule('anc'); rebuildSchedule('nouv');
+  updateStats(); renderCalendar();
+  closeMobileConfig();
+  toast('✅ Configuration appliquée !');
+}
+
 function applyConfig() {
   const nc=parseFloat(document.getElementById('cfg-cot').value);
   const nd=document.getElementById('cfg-devise').value.trim()||'$';
@@ -4025,7 +4097,7 @@ function exportPDF() {
   const receiptNum = 'JC-' + today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0') + '-' + Math.floor(Math.random()*9000+1000);
 
   // ── QR Code URL ──
-  const qrData    = encodeURIComponent('https://jeudi-cash.netlify.app');
+  const qrData    = encodeURIComponent('https://jeudi-cash.vercel.app/');
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}&bgcolor=0a0a0a&color=F0B429&margin=8`;
 
   // ── Construire les lignes ──
@@ -4535,9 +4607,13 @@ function launchConfetti(g){
   for(let i=0;i<70;i++){const el=document.createElement('div');el.className='confetti-piece';el.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${c[Math.floor(Math.random()*c.length)]};width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;animation-delay:${Math.random()*.8}s;animation-duration:${2+Math.random()*1.5}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(el);setTimeout(()=>el.remove(),4000);}
 }
 function toast(msg,err=false){
+  const mob=window.innerWidth<=768;
   const t=document.createElement('div');
-  t.style.cssText=`position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${err?'#2A0A0A':'#1A1A00'};color:${err?'#FF6B6B':'#F5C518'};border:1px solid ${err?'#FF4444':'#F5C518'};border-radius:8px;padding:10px 22px;font-family:'Space Mono',monospace;font-size:12px;z-index:9999;white-space:nowrap;letter-spacing:1px;box-shadow:0 4px 20px rgba(0,0,0,.4);`;
-  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);
+  t.style.cssText=`position:fixed;bottom:${mob?'90px':'28px'};left:50%;transform:translateX(-50%) translateY(10px);opacity:0;background:${err?'rgba(42,10,10,.97)':'rgba(26,26,0,.97)'};color:${err?'#FF6B6B':'#F5C518'};border:1px solid ${err?'rgba(255,68,68,.5)':'rgba(245,197,24,.4)'};border-radius:10px;padding:11px 22px;font-family:'Space Mono',monospace;font-size:12px;z-index:9999;max-width:90vw;white-space:${mob?'normal':'nowrap'};text-align:center;letter-spacing:1px;box-shadow:0 4px 24px rgba(0,0,0,.5);transition:opacity .25s ease,transform .25s ease;backdrop-filter:blur(8px);`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(8px)';setTimeout(()=>t.remove(),300);},2800);
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function copyText(t){if(navigator.clipboard)navigator.clipboard.writeText(t).catch(()=>{});else{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();}}
