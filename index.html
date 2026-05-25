@@ -3748,10 +3748,6 @@ body{background:#0A0A0A;color:#F0F0F0;font-family:'Manrope',sans-serif;}
       lors de la semaine #${String(benef.week).padStart(3,'0')} · ${benef.date}.<br>
       <span style="color:#222">Généré le ${dateStr} à ${timeStr}</span>
     </div>
-    <div style="text-align:center">
-      <img src="${qrUrl}" width="85" height="85" style="border-radius:7px;border:1px solid #1E1E1E" onerror="this.style.display='none'">
-      <div style="font-family:'Space Mono',monospace;font-size:8px;color:#555;margin-top:4px;letter-spacing:1px">APP JEUDI CASH</div>
-    </div>
   </div>
 </div>
 <script>window.onload=()=>{window.print();}<\/script>
@@ -4606,10 +4602,6 @@ function exportPDF() {
       Ce document est généré automatiquement et fait foi de l'état<br>
       du calendrier de tirage au moment de sa génération.<br>
       <span style="color:#333">🔄 = membre ayant effectué un échange · ✅ = réception confirmée</span>
-    </div>
-    <div class="qr-zone">
-      <img src="${qrCodeUrl}" width="100" height="100" style="border-radius:8px;border:1px solid #1E1E1E" onerror="this.style.display='none'">
-      <div class="qr-label">Scanner pour accéder<br>à l'application</div>
     </div>
   </div>
 
