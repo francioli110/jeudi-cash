@@ -2,19 +2,79 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#F5C518">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="background-color" content="#0A0A0A">
+
+<!-- PWA iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Jeudi Cash">
+
+<!-- PWA Android -->
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Tontine Jeudi Cash — Gestion et tirage au sort">
+<meta name="application-name" content="Jeudi Cash">
+
+<!-- SEO -->
+<meta name="description" content="Jeudi Cash — Application de gestion de tontine hebdomadaire">
+<meta name="keywords" content="tontine, jeudi cash, cotisation, épargne">
+
 <title>Jeudi Cash 💸</title>
-<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Jeudi Cash&quot;,&quot;short_name&quot;:&quot;JeudiCash&quot;,&quot;start_url&quot;:&quot;/&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230A0A0A&quot;,&quot;theme_color&quot;:&quot;%23F5C518&quot;}">
+
+<!-- Icône iOS (Apple Touch Icon) — SVG inline encodé -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%230A0A0A'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23F0B429' stroke-width='16'/%3E%3Ccircle cx='256' cy='256' r='170' fill='%23F0B429' opacity='.1'/%3E%3Ctext x='256' y='210' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3EJEUDI%3C/text%3E%3Ctext x='256' y='300' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3ECASH%3C/text%3E%3Ctext x='256' y='370' text-anchor='middle' font-size='60'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E">
+
+<!-- Splash screens iOS -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- Manifest PWA -->
+<link rel="manifest" id="pwa-manifest">
+
+<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
-<!-- Firebase SDK v9 compat (stable) -->
+
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+// ── Injecter le manifest dynamiquement ──
+(function() {
+  const manifest = {
+    name: "Jeudi Cash — Tontine",
+    short_name: "Jeudi Cash",
+    description: "Application de gestion de tontine hebdomadaire",
+    start_url: "/jeudi-cash/",
+    scope: "/jeudi-cash/",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#0A0A0A",
+    theme_color: "#F0B429",
+    categories: ["finance", "utilities"],
+    icons: [
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%230A0A0A'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23F0B429' stroke-width='16'/%3E%3Ctext x='256' y='210' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3EJEUDI%3C/text%3E%3Ctext x='256' y='300' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3ECASH%3C/text%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      },
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%230A0A0A'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23F0B429' stroke-width='16'/%3E%3Ctext x='256' y='210' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3EJEUDI%3C/text%3E%3Ctext x='256' y='300' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3ECASH%3C/text%3E%3C/svg%3E",
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ],
+    shortcuts: [
+      { name: "Suivi", url: "/jeudi-cash/#suivi", description: "Voir les cotisations" },
+      { name: "Notifs", url: "/jeudi-cash/#notifs", description: "Envoyer les notifications" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+})();
+</script>
 <style>
 /* ═══════════════════════════════════════════════════
    JEUDI CASH — Redesign 2.0
@@ -634,7 +694,16 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
 .copy-btn:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ── DASHBOARD ── */
-.dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:16px;}
+/* ══ GRAPHIQUES SVG ══ */
+.chart-wrap{position:relative;width:100%;overflow:hidden;}
+.chart-title{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+.chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:9px;color:var(--t2);}
+.chart-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.chart-tooltip{position:absolute;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:6px 10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--t1);pointer-events:none;z-index:10;display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);}
+.dash-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;transition:border-color .2s;}
+.dash-card:hover{border-color:var(--b2);}
+.dash-card-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);margin-bottom:14px;}
 .dash-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:18px;}
 .dash-card-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .ring-wrap{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;padding:8px 0;}
@@ -1081,6 +1150,7 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
 </div>
 
 <!-- ══ INSTALL BANNER ══ -->
+<!-- ══ BANNIÈRE INSTALLATION PWA ══ -->
 <div id="install-banner">
   <div class="install-icon">📲</div>
   <div class="install-text">
@@ -1089,6 +1159,68 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
   </div>
   <button class="install-btn" onclick="installApp()">Installer</button>
   <button class="install-close" onclick="dismissInstall()">✕</button>
+</div>
+
+<!-- ══ GUIDE INSTALLATION iOS ══ -->
+<div id="ios-install-guide" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  padding:20px;align-items:flex-end;justify-content:center;
+">
+  <div style="
+    background:var(--s1);border:1px solid var(--b2);border-radius:24px;
+    padding:24px;max-width:400px;width:100%;position:relative;
+    box-shadow:0 -8px 60px rgba(0,0,0,.8);
+  ">
+    <!-- Fermer -->
+    <button onclick="fermerGuideIOS()" style="position:absolute;top:14px;right:14px;background:var(--s2);border:1px solid var(--b1);border-radius:50%;width:32px;height:32px;color:var(--t2);font-size:16px;cursor:pointer">✕</button>
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:72px;height:72px;border-radius:18px;background:rgba(240,180,41,.15);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);line-height:1.1;text-align:center">JEUDI<br>CASH</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold)">INSTALLER L'APPLICATION</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:4px">Ajouter à l'écran d'accueil iPhone</div>
+    </div>
+
+    <!-- Étapes iOS -->
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+
+      <div style="display:flex;align-items:center;gap:12px;background:var(--s2);border-radius:12px;padding:12px">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(240,180,41,.15);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:700;font-size:13px">Appuie sur Partager</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:2px">Le bouton <span style="background:var(--s3);padding:2px 6px;border-radius:4px">⬆️</span> en bas de Safari</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;background:var(--s2);border-radius:12px;padding:12px">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(240,180,41,.15);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:700;font-size:13px">Sur l'écran d'accueil</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:2px">Fais défiler et appuie sur <span style="background:var(--s3);padding:2px 6px;border-radius:4px">➕ Sur l'écran d'accueil</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;background:var(--s2);border-radius:12px;padding:12px">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(16,185,129,.15);border:1px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green);flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:var(--green)">Appuie sur Ajouter ✅</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:2px">Jeudi Cash apparaît sur ton écran d'accueil !</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Animation flèche vers le bas (indique le bouton Partager) -->
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:28px;animation:bounce 1s infinite">⬇️</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3)">Bouton Partager en bas de l'écran</div>
+    </div>
+
+    <button onclick="fermerGuideIOS();localStorage.setItem('jc2_install_dismissed','1')" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--gold-light),var(--gold-dark));color:var(--bg);border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer">
+      J'AI COMPRIS ✓
+    </button>
+  </div>
 </div>
 
 <!-- ══════════════════════ MAIN APP ══════════════════════ -->
@@ -1304,6 +1436,7 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
           <div class="db-stat"><div class="db-stat-val" id="dbs-nouv" style="color:var(--nouveau)">0</div><div class="db-stat-lbl">Nouveaux</div></div>
           <div class="db-stat"><div class="db-stat-val" id="dbs-ok" style="color:var(--green)">0</div><div class="db-stat-lbl">À jour</div></div>
         </div>
+        <div id="interac-banner" style="display:none"></div>
         <div class="member-cards" id="db-cards">
           <div class="empty-state"><div class="empty-icon">🗄️</div><p>Aucune fiche enregistrée.<br>Clique sur <b>+ Nouvelle fiche</b>.</p></div>
         </div>
@@ -1860,6 +1993,25 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
             ⏰ ACTIVER RAPPEL AUTO
           </button>
         </div>
+
+        <!-- Nouvelles automatisations -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          <button class="btn btn-outline btn-sm" id="rappel-auto-btn" onclick="toggleRappelAuto()" style="font-size:11px">
+            ⏰ Rappel jeudi: OFF
+          </button>
+          <button class="btn btn-outline btn-sm" id="wa-confirm-auto-btn" onclick="toggleWAConfirmAuto()" style="font-size:11px">
+            📱 Confirmation WA: OFF
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="setupFCM()" style="font-size:11px;grid-column:span 2">
+            🔔 Activer notifications push
+          </button>
+        </div>
+
+        <!-- Config heure rappel -->
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3)">Heure du rappel jeudi :</div>
+          <input type="time" id="rappel-heure" value="08:00" class="db-search" style="width:110px" onchange="localStorage.setItem('jc2_rappel_config',JSON.stringify({heure:parseInt(this.value.split(':')[0]),minutes:parseInt(this.value.split(':')[1])}));if(localStorage.getItem('jc2_rappel_auto'))planifierRappelJeudiMatin()">
+        </div>
       </div>
 
       <!-- Liste non payés à 20h -->
@@ -1874,8 +2026,19 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
       <!-- Historique alertes -->
       <div class="trac-week-card">
         <div class="trac-week-title" style="font-size:16px;margin-bottom:14px">📋 Historique des alertes envoyées</div>
-        <div id="alertes-hist">
-          <div class="empty-state"><div class="empty-icon">📋</div><p>Aucune alerte envoyée.</p></div>
+        <div id="alertes-hist"></div>
+      </div>
+
+      <!-- Audit Trail -->
+      <div class="trac-week-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div class="trac-week-title" style="font-size:16px">🔍 Audit Trail — Historique des modifications</div>
+          <button class="btn btn-outline btn-sm" onclick="exportAuditCSV()">⬇️ CSV</button>
+        </div>
+        <div id="audit-trail-list">
+          <div class="empty-state"><div class="empty-icon">📋</div><p>Aucune modification enregistrée.</p></div>
+        </div>
+      </div>          <div class="empty-state"><div class="empty-icon">📋</div><p>Aucune alerte envoyée.</p></div>
         </div>
       </div>
 
@@ -1974,17 +2137,95 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
 
     <!-- ── HISTORIQUE PAIEMENTS ── -->
     <div id="trac-panel-historique" style="display:none">
-      <div class="trac-week-card">
-        <div class="trac-week-header">
-          <div class="trac-week-title">📜 Historique complet des confirmations</div>
-          <button class="btn btn-outline btn-sm" onclick="exportHistCSV()">⬇️ Export CSV</button>
-        </div>
-        <div id="trac-hist-empty" class="empty-state" style="padding:16px">
-          <div class="empty-icon">📜</div>
-          <p>Aucune confirmation enregistrée.</p>
-        </div>
-        <div id="trac-hist"></div>
+
+      <!-- Sous-onglets -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="tab active" id="hist-tab-confirmations" onclick="switchHistTab('confirmations',this)" style="font-size:11px">✅ Confirmations</button>
+        <button class="tab" id="hist-tab-cotisations" onclick="switchHistTab('cotisations',this)" style="font-size:11px">💳 Cotisations / semaine</button>
+        <button class="tab" id="hist-tab-stats" onclick="switchHistTab('stats',this)" style="font-size:11px">📊 Stats par membre</button>
+        <button class="tab" id="hist-tab-saisie" onclick="switchHistTab('saisie',this)" style="font-size:11px">✏️ Saisie manuelle</button>
       </div>
+
+      <!-- Confirmations -->
+      <div id="hist-panel-confirmations">
+        <div class="trac-week-card">
+          <div class="trac-week-header">
+            <div class="trac-week-title">✅ Historique des confirmations</div>
+            <button class="btn btn-outline btn-sm" onclick="exportHistCSV()">⬇️ CSV</button>
+          </div>
+          <div id="trac-hist-empty" class="empty-state" style="padding:16px">
+            <div class="empty-icon">📜</div><p>Aucune confirmation enregistrée.</p>
+          </div>
+          <div id="trac-hist"></div>
+        </div>
+      </div>
+
+      <!-- Cotisations par semaine -->
+      <div id="hist-panel-cotisations" style="display:none">
+        <div class="trac-week-card">
+          <div class="trac-week-header">
+            <div class="trac-week-title">💳 Historique des cotisations</div>
+            <button class="btn btn-outline btn-sm" onclick="exportCotisHistCSV()">⬇️ CSV</button>
+          </div>
+          <div style="margin-bottom:12px">
+            <select class="db-filter" id="hist-cotis-filter" onchange="renderCotisHist()" style="width:100%;font-size:14px">
+              <option value="">Toutes les semaines</option>
+            </select>
+          </div>
+          <div id="cotis-hist-content">
+            <div class="empty-state"><div class="empty-icon">💳</div><p>Aucun historique de cotisations.<br>Commence à cocher les paiements !</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats par membre -->
+      <div id="hist-panel-stats" style="display:none">
+        <div class="trac-week-card">
+          <div class="trac-week-header">
+            <div class="trac-week-title">📊 Statistiques par membre</div>
+            <button class="btn btn-outline btn-sm" onclick="exportStatsCSV()">⬇️ CSV</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select class="db-filter" id="stats-filter-groupe" onchange="renderStatsMembre()" style="flex:1;font-size:14px">
+              <option value="">Tous les groupes</option>
+              <option value="anc">⭐ Anciens</option>
+              <option value="nouv">🆕 Nouveaux</option>
+            </select>
+            <select class="db-filter" id="stats-filter-sort" onchange="renderStatsMembre()" style="flex:1;font-size:14px">
+              <option value="total">Tri : Total payé</option>
+              <option value="pct">Tri : % ponctualité</option>
+              <option value="nom">Tri : Nom A→Z</option>
+            </select>
+          </div>
+          <div id="stats-membre-content">
+            <div class="empty-state"><div class="empty-icon">📊</div><p>Aucune statistique disponible.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saisie manuelle des semaines passées -->
+      <div id="hist-panel-saisie" style="display:none">
+        <div class="trac-week-card">
+          <div class="trac-week-header">
+            <div class="trac-week-title">✏️ Saisie manuelle — Semaines passées</div>
+          </div>
+          <div style="background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.2);border-radius:10px;padding:12px;margin-bottom:14px">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);margin-bottom:6px">💡 Comment ça marche</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);line-height:1.8">
+              Sélectionne une semaine passée → coche qui a payé → Enregistrer<br>
+              Ceci remplira l'historique pour calculer les scores correctement
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);display:block;margin-bottom:6px">CHOISIR LA SEMAINE</label>
+            <select class="db-filter" id="saisie-semaine" onchange="loadSaisieManuelle()" style="width:100%;font-size:14px">
+              <option value="">— Choisir une semaine passée —</option>
+            </select>
+          </div>
+          <div id="saisie-manuelle-content"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── BÉNÉFICIAIRE ── -->
@@ -2225,15 +2466,32 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
 
     </div>
 
-    <!-- ══ FINANCES DÉTAILLÉES + MEMBRES ══ -->
+    <!-- ══ GRAPHIQUES FINANCES + COTISATIONS ══ -->
     <div class="dash-grid" style="margin-bottom:14px">
 
       <div class="dash-card">
-        <div class="dash-card-title">💰 Finances détaillées</div>
-        <div class="bar-chart" id="finance-chart"></div>
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--b1)">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Cotisations semaine en cours</div>
-          <div class="bar-track" style="height:12px;margin-bottom:6px">
+        <div class="dash-card-title">💰 Pots distribués par semaine</div>
+        <div class="chart-title">Montant $ CAD par bénéficiaire</div>
+        <div id="chart-finances" style="width:100%;min-height:160px"></div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-title">💳 Taux de paiement</div>
+        <div class="chart-title">% de membres payés par semaine</div>
+        <div id="chart-cotisations" style="width:100%;min-height:160px;position:relative"></div>
+      </div>
+
+    </div>
+
+    <!-- ══ GRAPHIQUES MEMBRES + STATUTS ══ -->
+    <div class="dash-grid" style="margin-bottom:14px">
+
+      <div class="dash-card">
+        <div class="dash-card-title">🎯 Progression des tirages</div>
+        <div id="chart-tirages" style="width:100%"></div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--b1)">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Cotisations — Semaine en cours</div>
+          <div class="bar-track" style="height:10px;margin-bottom:6px">
             <div class="bar-fill" id="cotis-bar" style="background:linear-gradient(90deg,var(--gold-dark),var(--gold))"></div>
           </div>
           <div style="display:flex;justify-content:space-between">
@@ -2244,11 +2502,10 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
       </div>
 
       <div class="dash-card">
-        <div class="dash-card-title">👥 Membres & Paiements</div>
-        <div class="bar-chart" id="membres-chart"></div>
-        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--b1)">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Statut paiements</div>
-          <div class="bar-chart" id="paiement-chart"></div>
+        <div class="dash-card-title">👥 Statut des membres</div>
+        <div id="chart-paiements" style="width:100%"></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--b1)">
+          <div id="chart-scores-top" style="width:100%"></div>
         </div>
       </div>
 
@@ -2375,8 +2632,13 @@ tbody tr:hover td{background:rgba(240,180,41,.02);}
       </div>
       <div class="form-grp">
         <label>💳 Numéro Interac</label>
-        <input type="tel" id="f-interac" placeholder="Ex: +1 514 000 0000 ou email" maxlength="80">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:4px">Numéro ou email pour recevoir les virements</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="tel" id="f-interac" placeholder="Ex: +1 514 000 0000 ou email@..." maxlength="80" style="flex:1">
+          <button type="button" class="btn btn-outline btn-sm" onclick="copierWAversInterac()" title="Copier le numéro WhatsApp" style="flex-shrink:0;white-space:nowrap">📱→💳</button>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:4px">
+          Numéro de téléphone ou email pour recevoir les virements Interac
+        </div>
       </div>
       <div class="form-grp">
         <label>Email</label>
@@ -3593,6 +3855,62 @@ function scheduleRender(fn, delay = 150) {
 // ═══════════════════════════════════════
 
 // ── Fonction universelle PDF — fonctionne iOS Safari + Android + Desktop ──
+// ── Copier le numéro WhatsApp dans le champ Interac ──
+function exportAuditCSV() {
+  const log = getAuditLog();
+  if (!log.length) { toast('⚠️ Aucune donnée à exporter', true); return; }
+  let csv = 'Date,Utilisateur,Action,Détails,Avant,Après\n';
+  log.forEach(e => {
+    csv += `"${e.ts}","${e.user}","${e.action}","${e.details}","${e.oldVal||''}","${e.newVal||''}"\n`;
+  });
+  const url = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  Object.assign(document.createElement('a'),{href:url,download:'jeudi-cash-audit.csv'}).click();
+  URL.revokeObjectURL(url);
+}
+
+function filtrerSansInterac() {
+  // Afficher seulement les membres sans Interac
+  const box = document.getElementById('db-cards');
+  if (!box) return;
+  const sansInterac = memberDB.filter(m => m && !m.interac);
+  if (!sansInterac.length) { toast('✅ Tous les membres ont un numéro Interac !'); return; }
+  const searchEl = document.getElementById('db-search');
+  if (searchEl) { searchEl.value = ''; }
+  // Afficher directement
+  box.innerHTML = sansInterac.map(m => `
+    <div style="display:flex;align-items:center;gap:10px;background:rgba(240,180,41,.05);border:1px solid rgba(240,180,41,.2);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+      <div class="mn-avatar ${m.groupe==='anc'?'av-anc':'av-nouv'}" style="width:36px;height:36px;font-size:13px;flex-shrink:0">
+        ${m.nom.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase()}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px">${esc(m.nom)}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3)">
+          ${m.tel ? `📱 ${m.tel}` : '📵 Pas de tél.'} · 💳 Interac manquant
+        </div>
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="openModal(${m.id})">✏️ Ajouter Interac</button>
+    </div>`).join('');
+  toast(`💳 ${sansInterac.length} membres sans Interac`);
+}
+
+function copierWAversInterac() {
+  const tel = document.getElementById('f-tel')?.value?.trim();
+  if (!tel) { toast('⚠️ Entre d\'abord le numéro WhatsApp', true); return; }
+  document.getElementById('f-interac').value = tel;
+  toast('✅ Numéro WhatsApp copié comme Interac !');
+}
+
+// ── Statut Interac global ──
+function getInteracStatus() {
+  const sansInterac = memberDB.filter(m => m && !m.interac);
+  return {
+    total:       memberDB.length,
+    avecInterac: memberDB.filter(m => m && m.interac).length,
+    sansInterac: sansInterac.length,
+    membres:     sansInterac.map(m => m.nom)
+  };
+}
+
 function ouvrirPDF(html, filename) {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
@@ -3971,8 +4289,12 @@ function init() {
   renderNotifications();
   renderDashboard();
   startCountdown();
+  loadPaymentHistory();
+  initModeHorsLigne();
+  updateNotifSettings(); // ── Afficher l'état des automatisations ──
+  if (localStorage.getItem('jc2_rappel_auto'))    planifierRappelJeudiMatin();
   if (localStorage.getItem('jc2_alerte_auto') === '1') planifierAlerteAuto();
-  // ── Backup automatique ──
+  addAudit('Connexion', `Rôle: ${currentRole}`, null, null);
   if (_backupAutoEnabled) planifierBackupAuto();
   renderBackupList();
 }
@@ -4782,7 +5104,23 @@ function doSwap(){
       updateTirageUI('anc'); updateTirageUI('nouv');
       renderChips('anc'); renderChips('nouv');
       renderSwapLog();
-      toast(`✅ ${nameA} ↔ ${nameB} — Échange enregistré dans Firebase !`);
+
+      // ── RÉINITIALISER cotisWeek si le bénéficiaire de la semaine courante a changé ──
+      const { monday, sunday } = getCurrentWeekBounds();
+      const swapAffecteCetteSemaine =
+        (slotA.iso && new Date(slotA.iso) >= monday && new Date(slotA.iso) <= sunday) ||
+        (slotB.iso && new Date(slotB.iso) >= monday && new Date(slotB.iso) <= sunday);
+
+      if (swapAffecteCetteSemaine) {
+        cotisWeek = null;
+        localStorage.removeItem('jc2_cotis_week');
+        db.ref('jeudi_cash/jc2_cotis_week').set(null).catch(()=>{});
+        toast(`✅ ${nameA} ↔ ${nameB} — Échange enregistré ! Cotisations réinitialisées pour le nouveau bénéficiaire.`);
+        // Reconstruire le cotisWeek avec le bon bénéficiaire
+        setTimeout(() => { buildCotisWeek(); renderTracabilite(); renderNotifications(); }, 500);
+      } else {
+        toast(`✅ ${nameA} ↔ ${nameB} — Échange enregistré dans Firebase !`);
+      }
 
     }).catch(e => {
       console.error(e);
@@ -5001,6 +5339,29 @@ function renderDB() {
   document.getElementById('dbs-nouv').textContent  = memberDB.filter(m=>m.groupe==='nouv').length;
   document.getElementById('dbs-ok').textContent    = memberDB.filter(m=>m.paiement==='ok').length;
 
+  // ── Bannière Interac manquant ──
+  const interacStatus = getInteracStatus();
+  const interacBanner = document.getElementById('interac-banner');
+  if (interacBanner) {
+    if (interacStatus.sansInterac > 0) {
+      interacBanner.style.display = 'block';
+      interacBanner.innerHTML = `
+        <div style="background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:20px">💳</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;color:var(--gold)">${interacStatus.sansInterac} membre${interacStatus.sansInterac>1?'s':''} sans numéro Interac</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">${interacStatus.membres.slice(0,5).join(' · ')}${interacStatus.membres.length>5?` · +${interacStatus.membres.length-5} autres`:''}</div>
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="filtrerSansInterac()">Voir tous</button>
+        </div>`;
+    } else if (memberDB.length > 0) {
+      interacBanner.innerHTML = `<div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)">✅ Tous les membres ont un numéro Interac enregistré !</div>`;
+      interacBanner.style.display = 'block';
+    } else {
+      interacBanner.style.display = 'none';
+    }
+  }
+
   let filtered = memberDB.filter(m => {
     const matchQ = !q  || m.nom.toLowerCase().includes(q)||(m.tel||'').includes(q)||(m.email||'').toLowerCase().includes(q)||(m.numero||'').toLowerCase().includes(q);
     const matchG = !fg || m.groupe===fg;
@@ -5090,6 +5451,7 @@ function renderDB() {
             <div class="family-name-big">${esc(fam.familyName)}</div>
             <div class="family-meta">
               ${tel?'📞 '+esc(tel)+'  ':''}${email?'✉️ '+esc(email):''}
+              ${fam.members.find(m=>m.interac)?'💳 '+esc(fam.members.find(m=>m.interac).interac):'<span style="color:var(--red);font-size:9px">💳 Interac manquant</span>'}
               ${!tel&&!email?'Pas de coordonnées enregistrées':''}
             </div>
           </div>
@@ -5135,23 +5497,63 @@ function exportDBCSV() {
 // ── Clé de l'historique des paiements par membre ──
 // Structure: paymentHistory = { "Leticia 1": [{week:1, paid:true, paidAt:"2026-05-07", late:false}, ...] }
 function getPaymentHistory() {
-  try { return JSON.parse(localStorage.getItem('jc2_pay_hist') || '{}'); } catch { return {}; }
+  try {
+    // Lire d'abord depuis Firebase cache, sinon localStorage
+    const fb = window._payHistCache;
+    if (fb) return fb;
+    return JSON.parse(localStorage.getItem('jc2_pay_hist') || '{}');
+  } catch { return {}; }
 }
-function savePaymentHistory(h) { localStorage.setItem('jc2_pay_hist', JSON.stringify(h)); }
+
+function savePaymentHistory(h) {
+  window._payHistCache = h;
+  localStorage.setItem('jc2_pay_hist', JSON.stringify(h));
+  // Sync Firebase avec debounce
+  clearTimeout(window._payHistTimer);
+  window._payHistTimer = setTimeout(() => {
+    if (db) db.ref('jeudi_cash/jc2_pay_hist').set(h).catch(()=>{});
+  }, 1000);
+}
 
 // ── Enregistrer un paiement dans l'historique ──
 function recordPayment(name, groupe, paid, weekNum) {
+  if (!name || weekNum === undefined) return;
   const hist = getPaymentHistory();
   if (!hist[name]) hist[name] = [];
-  const now  = new Date();
-  const isLate = now.getHours() >= 20; // payé après 20h = en retard
-  // Éviter doublons
+  const now     = new Date();
+  const isJeudi = now.getDay() === 4;
+  // Retard = payé un jeudi après 20h, OU pas un jeudi du tout (semaine passée)
+  const isLate  = paid && isJeudi && now.getHours() >= 20;
+  const isMissed= paid === false;
+
   const existing = hist[name].find(e => e.week === weekNum);
-  if (existing) { existing.paid = paid; existing.paidAt = now.toLocaleString('fr-CA'); existing.late = isLate && paid; }
-  else hist[name].push({ week: weekNum, paid, paidAt: now.toLocaleString('fr-CA'), late: isLate && paid, groupe });
+  if (existing) {
+    existing.paid   = paid;
+    existing.paidAt = paid ? now.toLocaleString('fr-CA') : null;
+    existing.late   = isLate;
+  } else {
+    hist[name].push({
+      week:   weekNum,
+      paid,
+      paidAt: paid ? now.toLocaleString('fr-CA') : null,
+      late:   isLate,
+      groupe,
+      recordedAt: now.toISOString()
+    });
+  }
   savePaymentHistory(hist);
-  // Sync Firebase
-  if (db) db.ref('jeudi_cash/jc2_pay_hist').set(hist).catch(()=>{});
+}
+
+// ── Initialiser l'historique depuis Firebase au démarrage ──
+function loadPaymentHistory() {
+  if (!db) return;
+  db.ref('jeudi_cash/jc2_pay_hist').once('value').then(snap => {
+    const val = snap.val();
+    if (val) {
+      window._payHistCache = val;
+      localStorage.setItem('jc2_pay_hist', JSON.stringify(val));
+    }
+  }).catch(()=>{});
 }
 
 // ── Calculer le score de confiance d'un membre ──
@@ -5350,30 +5752,233 @@ function renderAlertPanel() {
   }
 }
 
-function envoyerAlerte20h() {
-  const allM   = cotisWeek ? cotisWeek.membersState : [];
-  const unpaid = allM.filter(m => !m.paid);
-  const benef  = getCurrentWeekBenef();
-  const potStr = potDuBenefStr();
+// ═══════════════════════════════════════
+//  1. RAPPELS AUTOMATIQUES — Jeudi matin
+// ═══════════════════════════════════════
+
+let _rappelJeudiTimer = null;
+
+function planifierRappelJeudiMatin() {
+  clearTimeout(_rappelJeudiTimer);
   const now    = new Date();
+  const jour   = now.getDay();
+  const heure  = now.getHours();
+  const config = JSON.parse(localStorage.getItem('jc2_rappel_config') || '{"heure":8,"minutes":0}');
 
-  if (!unpaid.length) { toast('✅ Tout le monde a payé — aucune alerte nécessaire !'); return; }
+  // Calculer la prochaine occurrence du jeudi à l'heure configurée
+  const prochainJeudi = new Date(now);
+  const joursJusquaJeudi = (4 - jour + 7) % 7 || 7;
+  prochainJeudi.setDate(now.getDate() + joursJusquaJeudi);
+  prochainJeudi.setHours(config.heure, config.minutes || 0, 0, 0);
 
-  const names = unpaid.map(m => `❌ ${m.name}`).join('\n');
-  const benefDB2    = benef ? memberDB.find(x => x.nom === benef.name || x.nom?.trim() === benef.name?.trim()) : null;
-  const benefInter  = benefDB2?.interac || benefDB2?.tel || '';
-  const interacLine2 = benefInter ? `\n💳 *Interac : ${benefInter}*\n🔑 Question : JEUDI` : '';
-  const msg = `🚨 *ALERTE DERNIÈRE CHANCE — Jeudi Cash*\n\n⏰ Il est ${now.toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'})} · Clôture à *23h59*\n\n${benef?`🏆 Bénéficiaire : *${benef.name}*\n💰 Montant : *${potStr}*${interacLine2}\n\n`:''}_Les membres suivants n'ont pas encore payé :_\n${names}\n\n⚠️ *Merci de faire votre virement MAINTENANT !*\nChaque minute compte 🙏\n\n_Jeudi Cash · Tontine officielle_`;
+  // Si on est déjà jeudi et avant l'heure → même jour
+  if (jour === 4 && (heure < config.heure || (heure === config.heure && now.getMinutes() < (config.minutes||0)))) {
+    prochainJeudi.setDate(now.getDate());
+  }
 
-  // Sauvegarder dans l'historique
-  const alertHist = JSON.parse(localStorage.getItem('jc2_alert_hist') || '[]');
-  alertHist.unshift({ type: 'Alerte 20h', sentAt: now.toLocaleString('fr-CA'), count: unpaid.length });
-  localStorage.setItem('jc2_alert_hist', JSON.stringify(alertHist.slice(0, 50)));
+  const delay = prochainJeudi - now;
+  _rappelJeudiTimer = setTimeout(() => {
+    declencherRappelJeudiMatin();
+    planifierRappelJeudiMatin(); // re-planifier pour la semaine suivante
+  }, delay);
 
-  window.location.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  toast(`🚨 Alerte envoyée pour ${unpaid.length} membre${unpaid.length>1?'s':''} !`);
-  setTimeout(() => renderAlertPanel(), 500);
+  const hStr = prochainJeudi.toLocaleString('fr-CA', {weekday:'long', day:'2-digit', month:'long', hour:'2-digit', minute:'2-digit'});
+  console.log(`⏰ Rappel automatique planifié pour : ${hStr}`);
+  return prochainJeudi;
 }
+
+function declencherRappelJeudiMatin() {
+  const benef   = getCurrentWeekBenef();
+  if (!benef) return;
+  const potStr  = potDuBenefStr(benef.name);
+  const benefDB = memberDB.find(x => x.nom === benef.name || x.nom?.trim() === benef.name?.trim());
+  const interac = benefDB?.interac || benefDB?.tel || '';
+  const now     = new Date();
+  const dateStr = now.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+
+  const msg = `🏦 *JEUDI CASH — ${dateStr}*\n\n` +
+    `🏆 Bénéficiaire de la semaine : *${benef.name}*\n` +
+    `💰 Montant à recevoir : *${potStr}*\n` +
+    (interac ? `💳 Interac : *${interac}*\n🔑 Question : JEUDI\n` : '') +
+    `\n📲 *Merci de faire votre virement aujourd'hui !*\n` +
+    `\n_Jeudi Cash · Tontine officielle 🏦_`;
+
+  // Notification push si permission accordée
+  if (Notification.permission === 'granted') {
+    new Notification('🏦 Jeudi Cash — Rappel hebdomadaire', {
+      body: `Bénéficiaire : ${benef.name} · ${potStr}`,
+    });
+  }
+
+  // Enregistrer dans l'historique
+  const hist = JSON.parse(localStorage.getItem('jc2_alert_hist') || '[]');
+  hist.unshift({ type: 'Rappel jeudi matin', sentAt: now.toLocaleString('fr-CA'), count: cotisWeek?.membersState?.length || 0 });
+  localStorage.setItem('jc2_alert_hist', JSON.stringify(hist.slice(0, 50)));
+
+  // Ouvrir WhatsApp groupe
+  window.location.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+}
+
+// ═══════════════════════════════════════
+//  2. CONFIRMATION WA AUTOMATIQUE quand quelqu'un paie
+// ═══════════════════════════════════════
+
+function envoyerConfirmationPaiement(nom, groupe) {
+  if (!localStorage.getItem('jc2_wa_confirm_auto')) return; // désactivé par défaut
+  const dbM  = memberDB.find(x => x.nom === nom || x.nom?.trim() === nom.trim());
+  const tel  = (dbM?.tel || '').replace(/[^\d+]/g,'');
+  if (!tel) return;
+  const benef  = getCurrentWeekBenef();
+  const potStr = benef ? potDuBenefStr(benef.name) : '';
+  const now    = new Date().toLocaleString('fr-CA');
+  const prenom = nom.split(' ')[0];
+  const msg    = `✅ *Paiement confirmé — Jeudi Cash*\n\n` +
+    `Bonjour ${prenom} 👋\n\n` +
+    `Ton virement de *${COTISATION} ${DEVISE}* a bien été enregistré !\n` +
+    (benef ? `\n🏆 Bénéficiaire : *${benef.name}*\n💰 Montant : *${potStr}*\n` : '') +
+    `\nMerci pour ta ponctualité 🙏\n\n_Jeudi Cash · ${now}_`;
+  // Ouvrir WhatsApp sans rediriger la page (iframe trick)
+  const link = document.createElement('a');
+  link.href  = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  link.target= '_blank';
+  link.rel   = 'noopener';
+  link.click();
+}
+
+function toggleWAConfirmAuto() {
+  const current = localStorage.getItem('jc2_wa_confirm_auto');
+  if (current) {
+    localStorage.removeItem('jc2_wa_confirm_auto');
+    toast('⏸️ Confirmation WA automatique désactivée');
+  } else {
+    localStorage.setItem('jc2_wa_confirm_auto', '1');
+    toast('✅ Confirmation WA automatique activée ! Chaque membre recevra un WA quand sa coche est validée');
+  }
+  updateNotifSettings();
+}
+
+// ═══════════════════════════════════════
+//  3. AUDIT TRAIL — Historique des modifications
+// ═══════════════════════════════════════
+
+function getAuditLog() {
+  try { return JSON.parse(localStorage.getItem('jc2_audit') || '[]'); } catch { return []; }
+}
+
+function addAudit(action, details, oldVal, newVal) {
+  const log  = getAuditLog();
+  const entry = {
+    id:        Date.now(),
+    ts:        new Date().toLocaleString('fr-CA'),
+    iso:       new Date().toISOString(),
+    user:      currentRole || 'owner',
+    action,
+    details,
+    oldVal:    oldVal ? JSON.stringify(oldVal).substring(0, 100) : null,
+    newVal:    newVal ? JSON.stringify(newVal).substring(0, 100) : null,
+  };
+  log.unshift(entry);
+  // Garder 200 entrées max
+  localStorage.setItem('jc2_audit', JSON.stringify(log.slice(0, 200)));
+  // Sync Firebase
+  if (db) db.ref('jeudi_cash/jc2_audit').set(log.slice(0, 200)).catch(()=>{});
+}
+
+function renderAuditTrail() {
+  const box = document.getElementById('audit-trail-list');
+  if (!box) return;
+  const log = getAuditLog();
+  if (!log.length) {
+    box.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Aucune modification enregistrée.</p></div>`;
+    return;
+  }
+  const icons = {
+    'Paiement':      '💳', 'Tirage':      '🎰', 'Échange':    '🔄',
+    'Suppression':   '🗑️', 'Ajout':       '➕', 'Modification':'✏️',
+    'Confirmation':  '✅', 'Annulation':  '↩️', 'Config':     '⚙️',
+    'Connexion':     '🔐', 'Sauvegarde':  '💾',
+  };
+  box.innerHTML = log.slice(0, 50).map(e => {
+    const icon = icons[e.action] || '📝';
+    return `
+      <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--b1)">
+        <div style="font-size:18px;flex-shrink:0">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:12px">${e.action} <span style="color:var(--t3);font-weight:400">— ${e.details}</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">
+            ${e.ts} · Par : <span style="color:var(--gold)">${e.user}</span>
+          </div>
+          ${e.oldVal||e.newVal ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">
+            ${e.oldVal?`<span style="color:var(--red)">- ${e.oldVal}</span>`:''}
+            ${e.newVal?`<span style="color:var(--green)">+ ${e.newVal}</span>`:''}
+          </div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+//  4. FIREBASE CLOUD MESSAGING — Setup
+// ═══════════════════════════════════════
+
+function setupFCM() {
+  // FCM nécessite un backend serveur pour fonctionner complètement
+  // Cette version configure le token côté client
+  if (!('Notification' in window)) { toast('⚠️ Notifications non supportées', true); return; }
+
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      localStorage.setItem('jc2_notif_enabled', '1');
+      toast('✅ Notifications activées ! Tu recevras des alertes chaque jeudi.');
+
+      // Afficher instructions pour push réel
+      const msg = `Pour activer les notifications push réelles (même téléphone éteint), il faut configurer Firebase Cloud Messaging avec un serveur backend.\n\nPour l'instant, les notifications fonctionnent quand l'app est ouverte.`;
+      console.log('FCM:', msg);
+
+      // Planifier les rappels automatiques
+      planifierRappelJeudiMatin();
+      planifierAlerteAuto();
+    } else {
+      toast('⚠️ Permission refusée — active les notifications dans les paramètres', true);
+    }
+  });
+}
+
+function updateNotifSettings() {
+  const waAutoEl = document.getElementById('wa-confirm-auto-btn');
+  const rappelEl = document.getElementById('rappel-auto-btn');
+  const waAuto   = !!localStorage.getItem('jc2_wa_confirm_auto');
+  const rappelOn = !!localStorage.getItem('jc2_rappel_auto');
+
+  if (waAutoEl) {
+    waAutoEl.textContent    = waAuto ? '📱 Confirmation WA: ON' : '📱 Confirmation WA: OFF';
+    waAutoEl.style.background = waAuto ? 'rgba(37,211,102,.15)' : '';
+    waAutoEl.style.borderColor= waAuto ? 'rgba(37,211,102,.4)' : '';
+    waAutoEl.style.color      = waAuto ? '#25D366' : '';
+  }
+  if (rappelEl) {
+    rappelEl.textContent    = rappelOn ? '⏰ Rappel jeudi: ON' : '⏰ Rappel jeudi: OFF';
+    rappelEl.style.background = rappelOn ? 'rgba(240,180,41,.1)' : '';
+    rappelEl.style.borderColor= rappelOn ? 'rgba(240,180,41,.3)' : '';
+    rappelEl.style.color      = rappelOn ? 'var(--gold)' : '';
+  }
+}
+
+function toggleRappelAuto() {
+  const on = localStorage.getItem('jc2_rappel_auto');
+  if (on) {
+    localStorage.removeItem('jc2_rappel_auto');
+    clearTimeout(_rappelJeudiTimer);
+    toast('⏸️ Rappel automatique du jeudi désactivé');
+  } else {
+    localStorage.setItem('jc2_rappel_auto', '1');
+    const next = planifierRappelJeudiMatin();
+    const nextStr = next.toLocaleString('fr-CA', {weekday:'long', day:'2-digit', month:'long', hour:'2-digit', minute:'2-digit'});
+    toast(`✅ Rappel activé ! Prochain envoi : ${nextStr}`);
+  }
+  updateNotifSettings();
+}
+
 
 function activerAlerteAuto() {
   const now   = new Date();
@@ -5409,22 +6014,462 @@ function checkAndTriggerAlert() {
   const allM   = cotisWeek ? cotisWeek.membersState : [];
   const unpaid = allM.filter(m => !m.paid);
 
+  // ── Badge sur l'onglet Notifs si non payés ──
+  const notifTab = document.getElementById('tab-notif-btn');
+  const notifBn  = document.getElementById('bn-notifs');
+  if (day === 4 && unpaid.length > 0) {
+    const badgeHtml = `<span style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:99px;font-size:9px;font-weight:700;padding:1px 5px;font-family:'DM Mono',monospace">${unpaid.length}</span>`;
+    if (notifTab && !notifTab.querySelector('.notif-badge')) {
+      notifTab.style.position = 'relative';
+      notifTab.insertAdjacentHTML('beforeend', `<span class="notif-badge" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:99px;font-size:9px;font-weight:700;padding:1px 5px">${unpaid.length}</span>`);
+    } else if (notifTab) {
+      const b = notifTab.querySelector('.notif-badge');
+      if (b) b.textContent = unpaid.length;
+    }
+    if (notifBn) {
+      const b = notifBn.querySelector('.notif-badge');
+      if (!b) notifBn.insertAdjacentHTML('beforeend', `<span class="notif-badge" style="position:absolute;top:2px;right:2px;background:var(--red);color:#fff;border-radius:99px;font-size:9px;font-weight:700;padding:1px 5px">${unpaid.length}</span>`);
+      else b.textContent = unpaid.length;
+    }
+  } else {
+    // Enlever les badges
+    document.querySelectorAll('.notif-badge').forEach(b => b.remove());
+  }
+
+  // ── Notification push à 20h le jeudi ──
   if (day === 4 && hour === 20 && min < 5 && unpaid.length > 0 && Notification.permission === 'granted') {
     const lastAlert = localStorage.getItem('jc2_last_alert_day');
     const today     = now.toDateString();
-    if (lastAlert === today) return; // déjà envoyée aujourd'hui
+    if (lastAlert === today) return;
     localStorage.setItem('jc2_last_alert_day', today);
-
     new Notification('🚨 Jeudi Cash — Alerte 20h', {
-      body: `${unpaid.length} membre${unpaid.length>1?'s':''}  n'ont pas encore payé ! Échéance dans 3h59.`,
+      body: `${unpaid.length} membre${unpaid.length>1?'s':''} n'ont pas encore payé ! Échéance à 23h59.`,
       icon: '💸',
-      badge: '💸',
     });
+    toast(`🚨 Alerte 20h — ${unpaid.length} membres non payés`);
   }
 }
 
-// Vérifier l'alerte toutes les minutes
+// Vérifier toutes les minutes
 setInterval(checkAndTriggerAlert, 60000);
+// Vérifier aussi au chargement
+setTimeout(checkAndTriggerAlert, 3000);
+// ═══════════════════════════════════════
+//  GRAPHIQUES SVG INTERACTIFS
+// ═══════════════════════════════════════
+
+// ── Graphique barres vertical SVG ──
+function drawBarChart(containerId, data, opts = {}) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const W     = el.clientWidth || 300;
+  const H     = opts.height || 160;
+  const pad   = { top:20, right:10, bottom:40, left:50 };
+  const cW    = W - pad.left - pad.right;
+  const cH    = H - pad.top - pad.bottom;
+  const maxV  = Math.max(...data.map(d=>d.value), 1);
+  const barW  = Math.max(8, (cW / data.length) - 6);
+
+  let svg = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">`;
+
+  // Grille horizontale
+  [0, 0.25, 0.5, 0.75, 1].forEach(pct => {
+    const y = pad.top + cH * (1 - pct);
+    const val = Math.round(maxV * pct);
+    svg += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="#1E1E1E" stroke-width="1"/>`;
+    svg += `<text x="${pad.left - 6}" y="${y + 4}" text-anchor="end" font-family="monospace" font-size="9" fill="#555">${val>999?(val/1000).toFixed(0)+'k':val}</text>`;
+  });
+
+  // Barres
+  data.forEach((d, i) => {
+    const x    = pad.left + i * (cW / data.length) + (cW / data.length - barW) / 2;
+    const barH = (d.value / maxV) * cH;
+    const y    = pad.top + cH - barH;
+    const color= d.color || 'var(--gold)';
+    const pct  = maxV > 0 ? Math.round(d.value/maxV*100) : 0;
+
+    // Barre avec animation
+    svg += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4"
+      fill="${color}" opacity="0.85"
+      style="cursor:pointer;transition:opacity .2s"
+      onmouseover="this.style.opacity=1;document.getElementById('tt-${containerId}').style.display='block';document.getElementById('tt-${containerId}').innerHTML='<b>${esc(d.label)}</b><br>${d.value.toLocaleString('fr-CA')} ${opts.suffix||''}';"
+      onmouseout="this.style.opacity=0.85;document.getElementById('tt-${containerId}').style.display='none'"/>`;
+
+    // Valeur au-dessus
+    if (barH > 20) {
+      svg += `<text x="${x + barW/2}" y="${y - 4}" text-anchor="middle" font-family="monospace" font-size="9" fill="${color}">${d.value > 999 ? (d.value/1000).toFixed(1)+'k' : d.value}</text>`;
+    }
+
+    // Label en dessous
+    const labelY = pad.top + cH + 14;
+    const label  = d.label.length > 6 ? d.label.substring(0, 6) + '…' : d.label;
+    svg += `<text x="${x + barW/2}" y="${labelY}" text-anchor="middle" font-family="monospace" font-size="8" fill="#555">${esc(label)}</text>`;
+  });
+
+  svg += `</svg><div id="tt-${containerId}" class="chart-tooltip"></div>`;
+  el.innerHTML = svg;
+}
+
+// ── Graphique donut SVG ──
+function drawDonutChart(containerId, segments, opts = {}) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const size   = opts.size || 140;
+  const cx     = size / 2;
+  const cy     = size / 2;
+  const R      = size * 0.38;
+  const r      = size * 0.24;
+  const total  = segments.reduce((s, d) => s + d.value, 0);
+  if (total === 0) { el.innerHTML = `<div style="text-align:center;color:var(--t3);font-family:'DM Mono',monospace;font-size:10px;padding:20px">Aucune donnée</div>`; return; }
+
+  let startAngle = -Math.PI / 2;
+  let svgPaths   = '';
+
+  segments.forEach(seg => {
+    const angle    = (seg.value / total) * 2 * Math.PI;
+    const endAngle = startAngle + angle;
+    const x1 = cx + R * Math.cos(startAngle);
+    const y1 = cy + R * Math.sin(startAngle);
+    const x2 = cx + R * Math.cos(endAngle);
+    const y2 = cy + R * Math.sin(endAngle);
+    const x3 = cx + r * Math.cos(endAngle);
+    const y3 = cy + r * Math.sin(endAngle);
+    const x4 = cx + r * Math.cos(startAngle);
+    const y4 = cy + r * Math.sin(startAngle);
+    const large = angle > Math.PI ? 1 : 0;
+    const pct   = Math.round(seg.value / total * 100);
+
+    svgPaths += `<path d="M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${r} ${r} 0 ${large} 0 ${x4} ${y4} Z"
+      fill="${seg.color}" opacity="0.9" style="cursor:pointer;transition:opacity .2s"
+      onmouseover="this.style.opacity=1;document.getElementById('tt-${containerId}').style.display='block';document.getElementById('tt-${containerId}').innerHTML='<b>${esc(seg.label)}</b><br>${pct}% · ${seg.value.toLocaleString()}'"
+      onmouseout="this.style.opacity=0.9;document.getElementById('tt-${containerId}').style.display='none'"/>`;
+
+    startAngle = endAngle;
+  });
+
+  // Centre
+  const centerLabel = opts.centerLabel || total.toLocaleString();
+  const centerSub   = opts.centerSub   || '';
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="position:relative;flex-shrink:0">
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+          ${svgPaths}
+          <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="${size*0.13}" fill="#F0F0F0">${centerLabel}</text>
+          <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-family="monospace" font-size="${size*0.07}" fill="#555">${centerSub}</text>
+        </svg>
+        <div id="tt-${containerId}" class="chart-tooltip"></div>
+      </div>
+      <div class="chart-legend">
+        ${segments.map(s => `
+          <div class="chart-legend-item">
+            <div class="chart-legend-dot" style="background:${s.color}"></div>
+            <span>${esc(s.label)} <b style="color:${s.color}">${Math.round(s.value/total*100)}%</b></span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── Graphique ligne SVG (évolution) ──
+function drawLineChart(containerId, datasets, labels, opts = {}) {
+  const el = document.getElementById(containerId);
+  if (!el || !labels.length) return;
+  const W   = el.clientWidth || 300;
+  const H   = opts.height || 120;
+  const pad = { top:16, right:12, bottom:28, left:44 };
+  const cW  = W - pad.left - pad.right;
+  const cH  = H - pad.top - pad.bottom;
+  const allV= datasets.flatMap(d => d.values);
+  const maxV= Math.max(...allV, 1);
+  const minV= Math.min(...allV.filter(v=>v>0), 0);
+
+  let svg = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Grille
+  [0, 0.5, 1].forEach(pct => {
+    const y   = pad.top + cH * (1 - pct);
+    const val = Math.round(maxV * pct);
+    svg += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="#1E1E1E" stroke-width="1" stroke-dasharray="4,4"/>`;
+    svg += `<text x="${pad.left-5}" y="${y+4}" text-anchor="end" font-family="monospace" font-size="8" fill="#555">${val>999?(val/1000).toFixed(0)+'k':val}</text>`;
+  });
+
+  // Lignes de chaque dataset
+  datasets.forEach(ds => {
+    const points = ds.values.map((v, i) => {
+      const x = pad.left + (i / Math.max(labels.length-1, 1)) * cW;
+      const y = pad.top + cH * (1 - (v / maxV));
+      return `${x},${y}`;
+    });
+
+    // Zone sous la courbe
+    const areaPoints = `${pad.left},${pad.top+cH} ${points.join(' ')} ${pad.left+cW},${pad.top+cH}`;
+    svg += `<polygon points="${areaPoints}" fill="${ds.color}" opacity="0.08"/>`;
+
+    // Ligne
+    svg += `<polyline points="${points.join(' ')}" fill="none" stroke="${ds.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+
+    // Points
+    ds.values.forEach((v, i) => {
+      const x = pad.left + (i / Math.max(labels.length-1, 1)) * cW;
+      const y = pad.top + cH * (1 - (v / maxV));
+      svg += `<circle cx="${x}" cy="${y}" r="4" fill="${ds.color}" stroke="#0A0A0A" stroke-width="1.5" style="cursor:pointer"
+        onmouseover="document.getElementById('tt-${containerId}').style.display='block';document.getElementById('tt-${containerId}').style.left='${x}px';document.getElementById('tt-${containerId}').style.top='${y-30}px';document.getElementById('tt-${containerId}').innerHTML='<b>${esc(labels[i]||'')}</b><br>${v.toLocaleString()}';"
+        onmouseout="document.getElementById('tt-${containerId}').style.display='none'"/>`;
+    });
+  });
+
+  // Labels axe X
+  labels.forEach((label, i) => {
+    if (labels.length > 8 && i % 2 !== 0) return;
+    const x = pad.left + (i / Math.max(labels.length-1, 1)) * cW;
+    const short = String(label).length > 5 ? String(label).substring(0,5) : label;
+    svg += `<text x="${x}" y="${H - 6}" text-anchor="middle" font-family="monospace" font-size="8" fill="#555">${esc(String(short))}</text>`;
+  });
+
+  svg += `</svg><div id="tt-${containerId}" class="chart-tooltip" style="position:absolute"></div>`;
+  el.style.position = 'relative';
+  el.innerHTML = svg;
+}
+
+// ═══════════════════════════════════════
+//  DASHBOARD — Mise à jour avec graphiques
+// ═══════════════════════════════════════
+
+function switchHistTab(name, btn) {
+  ['confirmations','cotisations','stats','saisie'].forEach(t => {
+    const p = document.getElementById(`hist-panel-${t}`);
+    const b = document.getElementById(`hist-tab-${t}`);
+    if (p) p.style.display = t === name ? 'block' : 'none';
+    if (b) b.classList.toggle('active', t === name);
+  });
+  if (name === 'cotisations') renderCotisHist();
+  if (name === 'stats')       renderStatsMembre();
+  if (name === 'saisie')      initSaisieManuelle();
+}
+
+function renderCotisHist() {
+  const box    = document.getElementById('cotis-hist-content');
+  const filter = document.getElementById('hist-cotis-filter');
+  if (!box) return;
+  const hist = getPaymentHistory();
+  if (!Object.keys(hist).length) {
+    box.innerHTML = `<div class="empty-state"><div class="empty-icon">💳</div><p>Aucun historique.<br>Commence à cocher les paiements !</p></div>`;
+    return;
+  }
+  const semaines = new Set();
+  Object.values(hist).forEach(entries => entries.forEach(e => semaines.add(e.week)));
+  const semList = [...semaines].sort((a,b) => a - b);
+  const allSched = [...(Array.isArray(G.anc.schedule)?G.anc.schedule:Object.values(G.anc.schedule||{})),
+                   ...(Array.isArray(G.nouv.schedule)?G.nouv.schedule:Object.values(G.nouv.schedule||{}))];
+  if (filter) {
+    const cur = filter.value;
+    filter.innerHTML = '<option value="">Toutes les semaines</option>' +
+      semList.map(w => {
+        const s = allSched.find(x => x.week === w);
+        return `<option value="${w}" ${cur==w?'selected':''}>Sem. #${String(w).padStart(3,'0')} — ${s?.name||'—'}</option>`;
+      }).join('');
+    if (cur) filter.value = cur;
+  }
+  const selectedWeek = filter ? parseInt(filter.value) : null;
+  const weeksToShow  = selectedWeek ? [selectedWeek] : semList;
+  box.innerHTML = weeksToShow.map(w => {
+    const sched   = allSched.find(s => s.week === w);
+    const benef   = sched?.name || '—';
+    const date    = sched?.date || '—';
+    const membres = Object.entries(hist).map(([name, entries]) => ({ name, entry: entries.find(e => e.week === w) })).filter(m => m.entry);
+    const payes   = membres.filter(m => m.entry.paid);
+    const nonPayes= membres.filter(m => !m.entry.paid);
+    const tardifs = payes.filter(m => m.entry.late);
+    const pct     = membres.length > 0 ? Math.round(payes.length/membres.length*100) : 0;
+    return `
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold)">Semaine #${String(w).padStart(3,'0')}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3)">🏆 ${esc(benef)} · ${date}</div>
+          </div>
+          <div style="display:flex;gap:10px;font-family:'DM Mono',monospace;font-size:11px">
+            <span style="color:var(--green)">✅ ${payes.length}</span>
+            <span style="color:var(--orange)">⏰ ${tardifs.length}</span>
+            <span style="color:var(--red)">❌ ${nonPayes.length}</span>
+            <span style="color:var(--t3)">${pct}%</span>
+          </div>
+        </div>
+        <div style="background:var(--s3);border-radius:99px;height:6px;overflow:hidden;margin-bottom:10px">
+          <div style="width:${pct}%;height:100%;background:var(--green);border-radius:99px"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px">
+          ${payes.map(m=>`<div style="font-family:'DM Mono',monospace;font-size:9px;padding:4px 8px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15);border-radius:6px;color:${m.entry.late?'var(--orange)':'var(--green)'}">${m.entry.late?'⏰':'✅'} ${esc(m.name)}</div>`).join('')}
+          ${nonPayes.map(m=>`<div style="font-family:'DM Mono',monospace;font-size:9px;padding:4px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:6px;color:var(--red)">❌ ${esc(m.name)}</div>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderStatsMembre() {
+  const box    = document.getElementById('stats-membre-content');
+  const fg     = document.getElementById('stats-filter-groupe')?.value || '';
+  const sortBy = document.getElementById('stats-filter-sort')?.value || 'total';
+  if (!box) return;
+  const hist  = getPaymentHistory();
+  const ancM  = Array.isArray(G.anc.members)?G.anc.members.filter(n=>n):[];
+  const nouvM = Array.isArray(G.nouv.members)?G.nouv.members.filter(n=>n):[];
+  let membres = [...ancM.map(n=>({name:n,groupe:'anc'})),...nouvM.map(n=>({name:n,groupe:'nouv'}))].filter(m=>!fg||m.groupe===fg);
+  membres = membres.map(m => {
+    const entries = hist[m.name]||[];
+    const payees  = entries.filter(e=>e.paid);
+    const tardifs = entries.filter(e=>e.late);
+    const manques = entries.filter(e=>!e.paid);
+    return { ...m, entries, payees, tardifs, manques, totalPay:payees.length*COTISATION, pct:entries.length>0?Math.round(payees.length/entries.length*100):100, semaines:entries.length };
+  });
+  if (sortBy==='total') membres.sort((a,b)=>b.totalPay-a.totalPay);
+  if (sortBy==='pct')   membres.sort((a,b)=>b.pct-a.pct);
+  if (sortBy==='nom')   membres.sort((a,b)=>a.name.localeCompare(b.name));
+  if (!membres.length) { box.innerHTML=`<div class="empty-state"><div class="empty-icon">📊</div><p>Aucun membre.</p></div>`; return; }
+  const totalGlobal = membres.reduce((s,m)=>s+m.totalPay,0);
+  box.innerHTML = `
+    <div style="background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.2);border-radius:10px;padding:12px;margin-bottom:14px;text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold)">${totalGlobal.toLocaleString('fr-CA')} ${DEVISE}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px">TOTAL COTISÉ PAR TOUS LES MEMBRES</div>
+    </div>
+    ${membres.map((m,i) => {
+      const initials  = m.name.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
+      const avatarCls = m.groupe==='anc'?'av-anc':'av-nouv';
+      const score     = getMemberScore(m.name);
+      return `
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-left:3px solid ${score.color};border-radius:12px;padding:12px;margin-bottom:8px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--t3);min-width:22px">#${i+1}</div>
+          <div class="mn-avatar ${avatarCls}" style="width:34px;height:34px;font-size:12px;flex-shrink:0">${initials}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px">${esc(m.name)}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">✅${m.payees.length} · ⏰${m.tardifs.length} · ❌${m.manques.length} · ${m.semaines} sem.</div>
+            <div style="background:var(--s3);border-radius:99px;height:4px;overflow:hidden;margin-top:5px"><div style="width:${m.pct}%;height:100%;background:${score.color};border-radius:99px"></div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${m.totalPay.toLocaleString('fr-CA')}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--t3)">${DEVISE} · ${m.pct}%</div>
+          </div>
+        </div>`; }).join('')}`;
+}
+
+function exportCotisHistCSV() {
+  const hist = getPaymentHistory();
+  let csv = 'Membre,Semaine,Payé,Tardif,Date paiement\n';
+  Object.entries(hist).forEach(([name, entries]) => entries.forEach(e => {
+    csv += `"${name}",${e.week},"${e.paid?'Oui':'Non'}","${e.late?'Oui':'Non'}","${e.paidAt||'—'}"\n`;
+  }));
+  const url = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  Object.assign(document.createElement('a'),{href:url,download:'jeudi-cash-cotisations.csv'}).click();
+  URL.revokeObjectURL(url);
+}
+
+function exportStatsCSV() {
+  const hist = getPaymentHistory();
+  const ancM = Array.isArray(G.anc.members)?G.anc.members.filter(n=>n):[];
+  const nouvM= Array.isArray(G.nouv.members)?G.nouv.members.filter(n=>n):[];
+  let csv = 'Membre,Groupe,Semaines,Payés,Tardifs,Manqués,Total payé,Ponctualité\n';
+  [...ancM.map(n=>({name:n,g:'Ancien'})),...nouvM.map(n=>({name:n,g:'Nouveau'}))].forEach(m => {
+    const e=hist[m.name]||[]; const p=e.filter(x=>x.paid).length;
+    csv += `"${m.name}","${m.g}",${e.length},${p},${e.filter(x=>x.late).length},${e.filter(x=>!x.paid).length},${p*COTISATION} ${DEVISE},${e.length>0?Math.round(p/e.length*100):100}%\n`;
+  });
+  const url = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  Object.assign(document.createElement('a'),{href:url,download:'jeudi-cash-stats-membres.csv'}).click();
+  URL.revokeObjectURL(url);
+}
+
+function initSaisieManuelle() {
+  const sel = document.getElementById('saisie-semaine');
+  if (!sel) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const allSched = [...(Array.isArray(G.anc.schedule)?G.anc.schedule:Object.values(G.anc.schedule||{})),
+                   ...(Array.isArray(G.nouv.schedule)?G.nouv.schedule:Object.values(G.nouv.schedule||{}))
+                  ].filter(s=>{ const d=s.iso?new Date(s.iso):null; if(d)d.setHours(0,0,0,0); return d&&d<today; }).sort((a,b)=>a.week-b.week);
+  sel.innerHTML = '<option value="">— Choisir une semaine passée —</option>' +
+    allSched.map(s=>`<option value="${s.week}">#${String(s.week).padStart(3,'0')} — ${s.name} — ${s.date}</option>`).join('');
+}
+
+function loadSaisieManuelle() {
+  const weekNum = parseInt(document.getElementById('saisie-semaine')?.value);
+  const box     = document.getElementById('saisie-manuelle-content');
+  if (!weekNum || !box) return;
+  const hist    = getPaymentHistory();
+  const ancM    = Array.isArray(G.anc.members)?G.anc.members.filter(n=>n):[];
+  const nouvM   = Array.isArray(G.nouv.members)?G.nouv.members.filter(n=>n):[];
+  const allSched= [...(Array.isArray(G.anc.schedule)?G.anc.schedule:Object.values(G.anc.schedule||{})),
+                   ...(Array.isArray(G.nouv.schedule)?G.nouv.schedule:Object.values(G.nouv.schedule||{}))];
+  const benefSched = allSched.find(s=>s.week===weekNum);
+  const exclus  = benefSched ? getFamille(benefSched.name).membres.map(n=>n.trim()) : [];
+  const membres = [...ancM.filter(n=>!exclus.includes(n.trim())).map(n=>({name:n,groupe:'anc'})),
+                   ...nouvM.filter(n=>!exclus.includes(n.trim())).map(n=>({name:n,groupe:'nouv'}))];
+  box.innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-bottom:8px">Coche les membres qui ont payé cette semaine-là :</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-gold btn-sm" onclick="document.querySelectorAll('#saisie-checks input').forEach(c=>c.checked=true)">✅ Tous</button>
+        <button class="btn btn-outline btn-sm" onclick="document.querySelectorAll('#saisie-checks input').forEach(c=>c.checked=false)">☐ Aucun</button>
+      </div>
+      <div id="saisie-checks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;max-height:280px;overflow-y:auto;padding:2px">
+        ${membres.map(m=>{
+          const entry=(hist[m.name]||[]).find(e=>e.week===weekNum);
+          return `<label style="display:flex;align-items:center;gap:8px;background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:8px 10px;cursor:pointer">
+            <input type="checkbox" data-name="${m.name}" data-groupe="${m.groupe}" ${entry?.paid?'checked':''} style="width:16px;height:16px;accent-color:var(--gold)">
+            <div style="font-size:12px;font-weight:600">${esc(m.name)}</div>
+          </label>`;
+        }).join('')}
+      </div>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;margin-bottom:10px">
+      <input type="checkbox" id="saisie-tardif" style="accent-color:var(--orange)"> Marquer comme tardifs (après 20h)
+    </label>
+    <button class="btn btn-gold" style="width:100%" onclick="enregistrerSaisieManuelle(${weekNum})">
+      💾 Enregistrer la semaine #${String(weekNum).padStart(3,'0')}
+    </button>`;
+}
+
+function enregistrerSaisieManuelle(weekNum) {
+  const checks = document.querySelectorAll('#saisie-checks input[type="checkbox"]');
+  const isLate = document.getElementById('saisie-tardif')?.checked || false;
+  const hist   = getPaymentHistory();
+  checks.forEach(cb => {
+    const name=cb.dataset.name, groupe=cb.dataset.groupe, paid=cb.checked;
+    if (!hist[name]) hist[name]=[];
+    const ex = hist[name].find(e=>e.week===weekNum);
+    if (ex) { ex.paid=paid; ex.late=isLate&&paid; }
+    else hist[name].push({week:weekNum,paid,paidAt:paid?new Date().toLocaleString('fr-CA'):null,late:isLate&&paid,groupe});
+  });
+  savePaymentHistory(hist);
+  toast(`✅ Semaine #${String(weekNum).padStart(3,'0')} enregistrée !`);
+  renderCotisHist();
+}
+
+// ── Mode hors-ligne ──
+function initModeHorsLigne() {
+  const updateStatus = () => {
+    const isOnline = navigator.onLine;
+    const el = document.getElementById('sync-status');
+    if (!isOnline) {
+      if (el) { el.textContent='📴 Hors-ligne'; el.style.color='var(--orange)'; }
+    } else {
+      if (el) { el.textContent='🔄 Reconnexion…'; el.style.color='var(--gold)'; }
+      // Vider la file hors-ligne au retour
+      const queue = JSON.parse(localStorage.getItem('jc2_offline_queue')||'[]');
+      if (queue.length && db) {
+        const updates={};
+        queue.forEach(item=>{ updates[item.key]=item.value; });
+        db.ref('jeudi_cash').update(updates).then(()=>{
+          localStorage.removeItem('jc2_offline_queue');
+          toast(`✅ ${queue.length} modification${queue.length>1?'s':''} synchronisées !`);
+          setSyncStatus('saved');
+        }).catch(()=>setSyncStatus('error'));
+      }
+    }
+  };
+  window.addEventListener('online',  updateStatus);
+  window.addEventListener('offline', updateStatus);
+  if (!navigator.onLine) updateStatus();
+}
+
 function startCountdown() {
   function update() {
     const el = document.getElementById('tr-countdown');
@@ -5477,7 +6522,7 @@ function switchTracTab(name, btn) {
     if (tb) tb.classList.toggle('active', t === name);
   });
   if (name === 'scores')     renderScores();
-  if (name === 'alertes')    renderAlertPanel();
+  if (name === 'alertes')    { renderAlertPanel(); renderAuditTrail(); updateNotifSettings(); }
   if (name === 'retards')    renderRetards();
   if (name === 'historique') renderTracHist();
 }
@@ -5891,8 +6936,26 @@ function toggleCotis(idx, groupe) {
   if (!m) return;
   m.paid   = !m.paid;
   m.paidAt = m.paid ? new Date().toLocaleString('fr-CA') : null;
-  ls('jc2_cotis_week', cotisWeek);
-  // ── Enregistrer dans l'historique des paiements ──
+
+  // ── Audit trail ──
+  addAudit('Paiement', `${m.name} — Sem. #${String(cotisWeek.weekNum||0).padStart(3,'0')}`,
+    { paid: !m.paid }, { paid: m.paid, paidAt: m.paidAt });
+
+  // ── Confirmation WA automatique ──
+  if (m.paid) envoyerConfirmationPaiement(m.name, m.groupe);
+
+  // Sauvegarder localStorage immédiatement
+  try { localStorage.setItem('jc2_cotis_week', JSON.stringify(cotisWeek)); } catch(e) {}
+
+  // Sync Firebase immédiatement (pas via ls() qui a un debounce)
+  if (db) {
+    window._pauseListener?.();
+    db.ref('jeudi_cash/jc2_cotis_week').set(cotisWeek)
+      .then(() => { setSyncStatus('saved'); window._resumeListener?.(); })
+      .catch(() => { setSyncStatus('error'); window._resumeListener?.(); });
+  }
+
+  // Enregistrer dans l'historique des scores
   recordPayment(m.name, m.groupe, m.paid, cotisWeek.weekNum || 0);
   renderTracabilite();
   generateResumeMsg();
@@ -5900,8 +6963,21 @@ function toggleCotis(idx, groupe) {
 
 function markAllPaid() {
   if (!cotisWeek) return;
-  cotisWeek.membersState.forEach(m => { m.paid = true; m.paidAt = m.paidAt || new Date().toLocaleString('fr-CA'); });
-  ls('jc2_cotis_week', cotisWeek);
+  const now = new Date().toLocaleString('fr-CA');
+  cotisWeek.membersState.forEach(m => {
+    if (!m.paid) {
+      m.paid   = true;
+      m.paidAt = now;
+      recordPayment(m.name, m.groupe, true, cotisWeek.weekNum || 0);
+    }
+  });
+  try { localStorage.setItem('jc2_cotis_week', JSON.stringify(cotisWeek)); } catch(e) {}
+  if (db) {
+    window._pauseListener?.();
+    db.ref('jeudi_cash/jc2_cotis_week').set(cotisWeek)
+      .then(() => { setSyncStatus('saved'); window._resumeListener?.(); })
+      .catch(() => { setSyncStatus('error'); window._resumeListener?.(); });
+  }
   renderTracabilite();
   generateResumeMsg();
 }
@@ -5909,7 +6985,13 @@ function markAllPaid() {
 function markAllUnpaid() {
   if (!cotisWeek) return;
   cotisWeek.membersState.forEach(m => { m.paid = false; m.paidAt = null; });
-  ls('jc2_cotis_week', cotisWeek);
+  try { localStorage.setItem('jc2_cotis_week', JSON.stringify(cotisWeek)); } catch(e) {}
+  if (db) {
+    window._pauseListener?.();
+    db.ref('jeudi_cash/jc2_cotis_week').set(cotisWeek)
+      .then(() => { setSyncStatus('saved'); window._resumeListener?.(); })
+      .catch(() => { setSyncStatus('error'); window._resumeListener?.(); });
+  }
   renderTracabilite();
   generateResumeMsg();
 }
@@ -6652,66 +7734,90 @@ function renderDashboard() {
   if(progNouvFill) progNouvFill.style.width=(nouvTotal>0?(nouvDone/nouvTotal)*100:0)+'%';
   upd('prog-nouv-lbl', `${nouvDone}/${nouvTotal}`);
 
-  // Finances détaillées
-  const financeChart = document.getElementById('finance-chart');
-  if(financeChart){
-    const rows = [
-      {label:'Total cycle',       val:totalAttenduCycle, max:totalAttenduCycle, color:'var(--gold)'},
-      {label:'Distribué',         val:totalDistribue,    max:totalAttenduCycle, color:'var(--green)'},
-      {label:'À distribuer',      val:encoreADistribuer, max:totalAttenduCycle, color:'var(--blue)'},
-      {label:'Confirmé reçu',     val:totalRecu,         max:totalAttenduCycle, color:'var(--green)'},
-      {label:'En retard',         val:totalEnRetard,     max:totalAttenduCycle, color:'var(--red)'},
-      {label:'Récupérable futur', val:montantRecuperable,max:totalAttenduCycle, color:'var(--purple)'},
-    ];
-    financeChart.innerHTML = rows.map(r=>`
-      <div class="bar-row">
-        <span class="bar-label">${r.label}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${r.max>0?(r.val/r.max)*100:0}%;background:${r.color}"></div></div>
-        <span class="bar-val" style="color:${r.color}">${r.val>0?r.val.toLocaleString('fr-CA'):'0'}</span>
-      </div>`).join('');
-  }
+  // ── GRAPHIQUE 1 — Pots distribués par semaine (barres) ──
+  setTimeout(() => {
+    const allSchedFin = [...(Array.isArray(G.anc.schedule)?G.anc.schedule:Object.values(G.anc.schedule||{})),
+                        ...(Array.isArray(G.nouv.schedule)?G.nouv.schedule:Object.values(G.nouv.schedule||{}))]
+                       .filter(s=>s.name).sort((a,b)=>a.week-b.week).slice(0, 12);
+    const finData = allSchedFin.map(s => ({
+      label: `#${s.week} ${s.name?.split(' ')[0]||''}`,
+      value: potDuBenef(s.name),
+      color: s.name && receptionsHist.find(r=>r.weekNum===s.week) ? '#10B981' :
+             s.name && new Date(s.iso) < today ? '#F0B429' : '#3B82F6'
+    }));
+    if (finData.length) drawBarChart('chart-finances', finData, {suffix: DEVISE, height: 160});
+  }, 100);
 
-  // Cotisations semaine
-  const cotisBar2 = document.getElementById('cotis-bar');
-  if(cotisBar2) cotisBar2.style.width=cfPct+'%';
-  upd('cotis-collected-lbl', `${fmt(cfEntrees)} collecté`);
-  upd('cotis-missing-lbl', `${fmt(cfManquant)} manquant`);
+  // ── GRAPHIQUE 2 — Taux de paiement par semaine (ligne) ──
+  setTimeout(() => {
+    const hist = getPaymentHistory();
+    const semaines = new Set();
+    Object.values(hist).forEach(entries => entries.forEach(e => semaines.add(e.week)));
+    const semList = [...semaines].sort((a,b)=>a-b).slice(-8);
+    if (semList.length) {
+      const pctData = semList.map(w => {
+        const entries = Object.values(hist).map(e => e.find(x=>x.week===w)).filter(Boolean);
+        const payes   = entries.filter(e=>e.paid).length;
+        return entries.length > 0 ? Math.round(payes/entries.length*100) : 0;
+      });
+      drawLineChart('chart-cotisations',
+        [{values: pctData, color: '#10B981'}],
+        semList.map(w=>`S${w}`),
+        {height: 140}
+      );
+    } else {
+      const el = document.getElementById('chart-cotisations');
+      if (el) el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📊</div><p>Coche des cotisations<br>pour voir l'évolution</p></div>`;
+    }
+  }, 150);
 
-  // Membres
-  const membresChart = document.getElementById('membres-chart');
-  if(membresChart){
-    membresChart.innerHTML = [
-      {label:'Total',    val:total,    max:total||1, color:'var(--gold)'},
-      {label:'⭐ Anciens', val:ancTotal, max:total||1, color:'var(--ancien)'},
-      {label:'🆕 Nouveaux',val:nouvTotal,max:total||1, color:'var(--nouveau)'},
-      {label:'Tirés',    val:done,     max:total||1, color:'var(--green)'},
-      {label:'Restants', val:remaining,max:total||1, color:'var(--t3)'},
-    ].map(r=>`
-      <div class="bar-row">
-        <span class="bar-label">${r.label}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${(r.val/r.max)*100}%;background:${r.color}"></div></div>
-        <span class="bar-val" style="color:${r.color}">${r.val}</span>
-      </div>`).join('');
-  }
+  // ── GRAPHIQUE 3 — Donut tirages ──
+  setTimeout(() => {
+    drawDonutChart('chart-tirages', [
+      { label: '⭐ Anc. tirés',  value: ancDone,              color: '#F0B429' },
+      { label: '🆕 Nouv. tirés', value: nouvDone,             color: '#3B82F6' },
+      { label: 'Restants',       value: Math.max(0,remaining), color: '#1E1E1E' },
+    ], { size: 130, centerLabel: `${pct}%`, centerSub: 'fait' });
+  }, 100);
 
-  // Paiements
-  const paiChart = document.getElementById('paiement-chart');
-  if(paiChart){
+  // ── GRAPHIQUE 4 — Donut statuts paiements ──
+  setTimeout(() => {
     const ok      = memberDB.filter(m=>m.paiement==='ok').length;
     const pending = memberDB.filter(m=>m.paiement==='pending').length;
     const late    = memberDB.filter(m=>m.paiement==='late').length;
-    const dbTotal = memberDB.length || 1;
-    paiChart.innerHTML = [
-      {label:'✅ À jour',     val:ok,     max:dbTotal, color:'var(--green)'},
-      {label:'⏳ En attente', val:pending, max:dbTotal, color:'var(--gold)'},
-      {label:'❌ En retard',  val:late,    max:dbTotal, color:'var(--red)'},
-    ].map(r=>`
-      <div class="bar-row">
-        <span class="bar-label">${r.label}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${(r.val/r.max)*100}%;background:${r.color}"></div></div>
-        <span class="bar-val" style="color:${r.color}">${r.val}</span>
-      </div>`).join('');
-  }
+    const noInfo  = memberDB.length - ok - pending - late;
+    drawDonutChart('chart-paiements', [
+      { label: '✅ À jour',     value: ok,      color: '#10B981' },
+      { label: '⏳ En attente', value: pending,  color: '#F0B429' },
+      { label: '❌ En retard',  value: late,     color: '#EF4444' },
+      { label: '— Non défini', value: noInfo,   color: '#2A2A2A' },
+    ].filter(s=>s.value>0), { size: 130, centerLabel: memberDB.length, centerSub: 'membres' });
+
+    // Top 5 scores dans la même carte
+    const hist = getPaymentHistory();
+    const topScores = [...(Array.isArray(G.anc.members)?G.anc.members:Object.values(G.anc.members||{})).filter(n=>n),
+                       ...(Array.isArray(G.nouv.members)?G.nouv.members:Object.values(G.nouv.members||{})).filter(n=>n)]
+      .map(n => ({ name:n, ...getMemberScore(n) }))
+      .sort((a,b)=>b.score-a.score).slice(0,5);
+    const scoresEl = document.getElementById('chart-scores-top');
+    if (scoresEl && topScores.length) {
+      scoresEl.innerHTML = `
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">🏅 Top 5 ponctualité</div>
+        ${topScores.map((m,i)=>`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--t3);min-width:18px">${['🥇','🥈','🥉','4','5'][i]}</span>
+            <span style="font-size:12px;font-weight:600;flex:1">${esc(m.name)}</span>
+            <div style="background:var(--s3);border-radius:99px;height:5px;width:60px;overflow:hidden"><div style="width:${m.score}%;height:100%;background:${m.color};border-radius:99px"></div></div>
+            <span style="font-family:'DM Mono',monospace;font-size:10px;color:${m.color};min-width:30px;text-align:right">${m.score}</span>
+          </div>`).join('')}`;
+    }
+  }, 200);
+
+  // Cotisations semaine courante
+  const cotisBar2 = document.getElementById('cotis-bar');
+  if(cotisBar2) cotisBar2.style.width = cfPct + '%';
+  upd('cotis-collected-lbl', `${fmt(cfEntrees)} collecté`);
+  upd('cotis-missing-lbl',   `${fmt(cfManquant)} manquant`);
 
   // Timeline prochains bénéficiaires
   const timeline = document.getElementById('next-benef-timeline');
@@ -7163,54 +8269,171 @@ function switchTab(name, btn) {
 }
 
 // Install PWA
+// ═══════════════════════════════════════
+//  PWA — Installation complète iOS + Android
+// ═══════════════════════════════════════
+
 let deferredPrompt = null;
+
+// Android/Chrome — capturer l'événement d'installation
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  // Show install banner after 3 seconds
-  setTimeout(() => {
-    if (!localStorage.getItem('jc_install_dismissed')) {
+  if (!localStorage.getItem('jc2_install_dismissed')) {
+    setTimeout(() => {
       document.getElementById('install-banner').style.display = 'flex';
-      // Auto-dismiss after 8 seconds
-      setTimeout(() => dismissInstall(), 8000);
-    }
-  }, 3000);
+      setTimeout(() => dismissInstall(), 10000);
+    }, 4000);
+  }
+});
+
+// Android — confirmer l'installation
+window.addEventListener('appinstalled', () => {
+  toast('🎉 Jeudi Cash installé avec succès !');
+  dismissInstall();
+  deferredPrompt = null;
+  localStorage.setItem('jc2_installed', '1');
 });
 
 function installApp() {
-  if (deferredPrompt) {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  if (isIOS) {
+    // iOS — afficher le guide étape par étape
+    dismissInstall();
+    afficherGuideIOS();
+  } else if (deferredPrompt) {
+    // Android/Chrome — déclencher l'installation native
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(result => {
       if (result.outcome === 'accepted') {
-        toast('✅ Jeudi Cash installé sur votre écran d\'accueil !');
+        toast('✅ Jeudi Cash installé !');
+      } else {
+        toast('Installation annulée');
       }
       deferredPrompt = null;
       dismissInstall();
     });
   } else {
-    // iOS instructions
-    toast('Sur iPhone : appuie sur ⬆️ puis "Sur l\'écran d\'accueil"');
+    // Autre — afficher le guide générique
+    afficherGuideIOS();
     dismissInstall();
   }
 }
 
-function dismissInstall() {
-  document.getElementById('install-banner').style.display = 'none';
-  localStorage.setItem('jc_install_dismissed', '1');
+function afficherGuideIOS() {
+  const guide = document.getElementById('ios-install-guide');
+  if (guide) guide.style.display = 'flex';
 }
 
-// iOS — show install hint if not installed
+function fermerGuideIOS() {
+  const guide = document.getElementById('ios-install-guide');
+  if (guide) guide.style.display = 'none';
+}
+
+function dismissInstall() {
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.style.display = 'none';
+  localStorage.setItem('jc2_install_dismissed', '1');
+}
+
+// Détecter iOS et afficher la bannière appropriée
 window.addEventListener('load', () => {
-  const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isStandalone = window.navigator.standalone;
-  if (isIOS && !isStandalone && !localStorage.getItem('jc_install_dismissed')) {
+  const isIOS        = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true ||
+                       window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed    = localStorage.getItem('jc2_install_dismissed');
+  const installed    = localStorage.getItem('jc2_installed');
+
+  if (isStandalone) {
+    // Déjà installé — ne pas afficher la bannière
+    console.log('✅ Jeudi Cash — Mode PWA standalone actif');
+    document.getElementById('install-banner').style.display = 'none';
+    return;
+  }
+
+  if (!dismissed && !installed) {
     setTimeout(() => {
-      document.getElementById('install-banner').style.display = 'flex';
-      // Auto-dismiss after 8 seconds
-      setTimeout(() => dismissInstall(), 8000);
-    }, 3000);
+      const banner = document.getElementById('install-banner');
+      if (banner) {
+        banner.style.display = 'flex';
+        // Personnaliser le texte selon l'appareil
+        if (isIOS) {
+          const sub = banner.querySelector('.install-sub');
+          if (sub) sub.textContent = 'Appuie sur ⬆️ puis "Sur l\'écran d\'accueil"';
+        }
+        setTimeout(() => dismissInstall(), 12000);
+      }
+    }, 5000);
   }
 });
+
+// ── Service Worker pour le cache hors-ligne ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Service Worker inline via Blob
+    const swCode = `
+const CACHE = 'jeudi-cash-v1';
+const ASSETS = [
+  '/',
+  '/jeudi-cash/',
+  '/jeudi-cash/index.html',
+  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Manrope:wght@400;600;800&display=swap',
+  'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js'
+];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => cache.addAll(ASSETS).catch(()=>{}))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', e => {
+  // Ne pas intercepter Firebase
+  if (e.request.url.includes('firebaseio.com') ||
+      e.request.url.includes('googleapis.com/identitytoolkit')) return;
+
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        if (res && res.status === 200 && e.request.method === 'GET') {
+          const clone = res.clone();
+          caches.open(CACHE).then(cache => cache.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => cached || new Response('Hors-ligne', {status:503}));
+    })
+  );
+});
+`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl  = URL.createObjectURL(swBlob);
+
+    navigator.serviceWorker.register(swUrl, {scope: '/jeudi-cash/'})
+      .then(reg => {
+        console.log('✅ Service Worker enregistré — App disponible hors-ligne');
+        reg.update();
+      })
+      .catch(err => {
+        // GitHub Pages — essayer sans scope
+        navigator.serviceWorker.register(swUrl)
+          .then(() => console.log('✅ Service Worker actif'))
+          .catch(() => console.log('Service Worker non supporté'));
+      });
+  });
+}
 
 // ── ACCÈS LIBRE (sans mot de passe) ──
 currentRole = 'owner';
