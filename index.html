@@ -3973,6 +3973,31 @@ try {
   console.warn('⚠️ Firebase init failed:', e);
 }
 
+// ── DONNÉES MEMBRES INTÉGRÉES (fallback garanti) ──
+// Ces données sont toujours disponibles même sans Firebase
+const MEMBRES_ANCIENS_DEFAULT = [
+  'Ramona 1','Barbara 2',"Jeanne d'arc",'Michelle 1','Michelle 2',
+  'Leticia 1','Ramona 2','Emmanuel  2','Marcial','Viviane 2',
+  'Estelle 1','Isabelle','Ndebi  2','Maxime 1','Leticia 3',
+  'Emmanuel  1','Viviane 1','Nadia','Estelle 2','Maxime 2',
+  'Maguy 1','Barbara 1','Nicole 1','Mibelle','Nicole 2',
+  'Leticia 2','Axelle','Frechnele','Bertrand 2','Ndebi  1',
+  'Maguy 2','Bertrand 1'
+];
+const MEMBRES_NOUVEAUX_DEFAULT = ['Kevin','Damarisse','Raisa'];
+
+// Appliquer les données par défaut si G est vide
+function appliquerDonneesDefaut() {
+  if (!G.anc.members.length) {
+    G.anc.members = [...MEMBRES_ANCIENS_DEFAULT];
+    console.log('✅ Membres anciens chargés depuis données intégrées');
+  }
+  if (!G.nouv.members.length) {
+    G.nouv.members = [...MEMBRES_NOUVEAUX_DEFAULT];
+    console.log('✅ Membres nouveaux chargés depuis données intégrées');
+  }
+}
+
 // Show sync indicator
 function setSyncStatus(status) {
   const els = document.querySelectorAll('#sync-status');
@@ -5284,6 +5309,9 @@ function init() {
   if (!Array.isArray(G.nouv.members)) G.nouv.members = Object.values(G.nouv.members||{}).filter(n=>n&&typeof n==='string');
   G.anc.members  = G.anc.members.filter(n=>n&&typeof n==='string');
   G.nouv.members = G.nouv.members.filter(n=>n&&typeof n==='string');
+
+  // Appliquer données intégrées si vide
+  appliquerDonneesDefaut();
 
   // Construire cotisWeek si pas encore fait
   if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) {
@@ -11183,6 +11211,9 @@ function renderAll() {
   if (!Array.isArray(G.nouv.members)) G.nouv.members = Object.values(G.nouv.members||{}).filter(n=>n&&typeof n==='string');
   G.anc.members  = G.anc.members.filter(n=>n&&typeof n==='string');
   G.nouv.members = G.nouv.members.filter(n=>n&&typeof n==='string');
+
+  // Appliquer données intégrées si Firebase n'a pas chargé
+  appliquerDonneesDefaut();
 
   if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
 
