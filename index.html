@@ -530,12 +530,37 @@ label{
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .member-grid{display:flex;flex-direction:column;gap:2px;}
 .member-row{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--r-sm);
-  border:1px solid transparent;transition:all .15s;
-  cursor:default;
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--r-sm);
+  border:1px solid var(--b1);background:var(--s2);
+  margin-bottom:4px;transition:all .15s;
 }
-.member-row:hover{background:var(--s2);border-color:var(--b0);}
+.member-row:hover{border-color:var(--b2);background:var(--s3);}
+.m-num{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--t3);letter-spacing:.5px;min-width:32px;flex-shrink:0;
+}
+.member-row input[type="text"]{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--t1);font-family:'Inter',sans-serif;font-size:13px;
+  font-weight:500;min-width:0;
+}
+.member-row input[type="text"].drawn-name{color:var(--gold);}
+.member-row input[type="text"]::placeholder{color:var(--t4);}
+.btn-rm{
+  background:transparent;border:none;
+  color:var(--t3);cursor:pointer;font-size:14px;
+  padding:4px 6px;border-radius:6px;flex-shrink:0;
+  transition:all .15s;
+}
+.btn-rm:hover{background:var(--red-bg);color:var(--red);}
+.member-grid{
+  display:flex;flex-direction:column;
+  max-height:320px;overflow-y:auto;
+  gap:2px;padding:2px;
+}
+.member-grid::-webkit-scrollbar{width:4px;}
+.member-grid::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
 .mn-avatar{
   width:36px;height:36px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -552,8 +577,47 @@ label{
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   IMPORT BOX
+   GLOBAL INPUT OVERRIDES (iOS dark fix)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+input,select,textarea{
+  color-scheme:dark;
+  background-color:var(--s2);
+  color:var(--t1);
+  border:1px solid var(--b1);
+  border-radius:var(--r-sm);
+  font-family:'Inter',sans-serif;
+}
+input[type="text"],input[type="email"],
+input[type="tel"],input[type="number"],
+input[type="date"],input[type="time"],
+input[type="password"],textarea,select{
+  -webkit-appearance:none;
+  appearance:none;
+  background:var(--s2) !important;
+  color:var(--t1) !important;
+  border:1px solid var(--b1);
+  border-radius:var(--r-sm);
+}
+input::placeholder,textarea::placeholder{
+  color:var(--t4) !important;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none;
+  border-color:var(--gold-border);
+  box-shadow:0 0 0 2px rgba(240,180,41,.08);
+}
+/* Checkbox accent */
+input[type="checkbox"]{
+  accent-color:var(--gold);
+  width:16px;height:16px;
+}
+/* Select arrow color */
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B6B80'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  padding-right:28px;
+}
 .import-box{
   border:1.5px dashed var(--b2);border-radius:var(--r-lg);
   padding:28px 20px;text-align:center;cursor:pointer;
@@ -659,23 +723,25 @@ label{
 .cotis-grid-display{display:flex;flex-direction:column;gap:4px;}
 .cotis-row{
   display:flex;align-items:center;gap:10px;
-  padding:9px 12px;border-radius:var(--r-sm);
-  border:1px solid var(--b0);transition:all .15s;
+  padding:9px 12px;border-radius:10px;
+  border:1px solid var(--b0);margin-bottom:3px;
+  transition:background .15s;
 }
-.cotis-row.paid{background:var(--green-bg);border-color:rgba(0,200,150,.15);}
+.cotis-row.paid{background:rgba(0,200,150,.06);border-color:rgba(0,200,150,.12);}
 .cotis-row.unpaid{background:var(--s2);}
 .cotis-toggle{
-  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--b2);
-  background:transparent;cursor:pointer;transition:all .2s;
+  width:24px;height:24px;border-radius:50%;
+  border:1.5px solid var(--b2);background:transparent;
+  cursor:pointer;transition:all .2s;
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;color:transparent;flex-shrink:0;
+  font-size:13px;color:transparent;flex-shrink:0;
 }
 .cotis-row.paid .cotis-toggle{
   background:var(--green);border-color:var(--green);color:#fff;
 }
-.cotis-name{font-weight:600;font-size:13px;flex:1;letter-spacing:-.1px;}
+.cotis-name{font-weight:600;font-size:14px;flex:1;letter-spacing:-.1px;}
 .cotis-amount{
-  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);
 }
 .cotis-time{
   font-family:'JetBrains Mono',monospace;font-size:9px;
@@ -1011,11 +1077,11 @@ label{
    HOME SCREEN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .home-action-btn{
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  background:var(--s2);border:1px solid var(--b1);border-radius:var(--r-lg);
-  padding:16px 12px;cursor:pointer;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:var(--s2);border:1px solid var(--b1);border-radius:12px;
+  padding:10px 8px;cursor:pointer;transition:all .15s;
   font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t2);
-  letter-spacing:.5px;text-align:center;
+  letter-spacing:.3px;text-align:center;
 }
 .home-action-btn:hover{background:var(--gold-subtle);border-color:var(--gold-border);color:var(--gold);}
 .home-action-btn:active{transform:scale(.96);}
@@ -1675,14 +1741,66 @@ label{
     </p>
   </header>
 
-  <!-- CONFIG (owner only) -->
-  <div class="global-config" id="cfg-bar">
-    <div class="cfg-title">⚙️ CONFIG</div>
-    <div class="cfg-grp"><label>Cotisation</label><input type="number" id="cfg-cot" min="0" value="200"></div>
-    <div class="cfg-grp"><label>Devise</label><input type="text" id="cfg-devise" maxlength="8" value="$ CAD" style="width:80px"></div>
-    <div class="cfg-grp"><label>Premier jeudi</label><input type="date" id="cfg-date"></div>
-    <button class="btn btn-gold btn-sm" onclick="applyConfig()">Appliquer</button>
-    <button class="btn btn-red btn-sm" onclick="resetAll()">🗑️ Tout réinitialiser</button>
+  <!-- CONFIG (owner only) — barre de réglages discrète -->
+  <div id="cfg-bar" style="
+    display:flex;align-items:center;gap:0;
+    background:var(--s1);border-bottom:1px solid var(--b0);
+    overflow-x:auto;scrollbar-width:none;
+  ">
+    <!-- Icône settings -->
+    <div style="
+      padding:10px 12px;color:var(--t3);font-size:14px;
+      border-right:1px solid var(--b0);flex-shrink:0;
+      display:flex;align-items:center;
+    ">⚙️</div>
+
+    <!-- Cotisation -->
+    <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-right:1px solid var(--b0);flex-shrink:0">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;white-space:nowrap">COT.</span>
+      <input type="number" id="cfg-cot" min="0" value="200" style="
+        width:64px;padding:5px 8px;border-radius:8px;
+        background:var(--s2);border:1px solid var(--b1);
+        color:var(--t1);font-family:'Space Grotesk',sans-serif;
+        font-weight:700;font-size:13px;outline:none;text-align:center;
+      ">
+    </div>
+
+    <!-- Devise -->
+    <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-right:1px solid var(--b0);flex-shrink:0">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;white-space:nowrap">DEV.</span>
+      <input type="text" id="cfg-devise" maxlength="8" value="$ CAD" style="
+        width:68px;padding:5px 8px;border-radius:8px;
+        background:var(--s2);border:1px solid var(--b1);
+        color:var(--t1);font-family:'Space Grotesk',sans-serif;
+        font-weight:700;font-size:13px;outline:none;text-align:center;
+      ">
+    </div>
+
+    <!-- Date -->
+    <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-right:1px solid var(--b0);flex-shrink:0">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;white-space:nowrap">DÉBUT</span>
+      <input type="date" id="cfg-date" style="
+        padding:5px 8px;border-radius:8px;
+        background:var(--s2);border:1px solid var(--b1);
+        color:var(--t1);font-family:'JetBrains Mono',monospace;
+        font-size:11px;outline:none;
+      ">
+    </div>
+
+    <!-- Boutons -->
+    <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;flex-shrink:0;margin-left:auto">
+      <button onclick="applyConfig()" style="
+        padding:6px 14px;border-radius:8px;border:none;
+        background:linear-gradient(135deg,var(--gold-light),var(--gold));
+        color:#000;font-family:'Inter',sans-serif;font-weight:700;
+        font-size:12px;cursor:pointer;white-space:nowrap;
+      ">✓ OK</button>
+      <button onclick="if(confirm('Tout réinitialiser ?')) resetAll()" style="
+        padding:6px 10px;border-radius:8px;
+        background:var(--red-bg);border:1px solid rgba(255,77,77,.2);
+        color:var(--red);font-size:14px;cursor:pointer;
+      " title="Réinitialiser">🗑️</button>
+    </div>
   </div>
 
   <!-- STATS -->
@@ -1727,115 +1845,82 @@ label{
   <!-- ══ HOME — ÉCRAN D'ACCUEIL ══ -->
   <div class="tab-panel active" id="tab-home">
 
-    <!-- Bénéficiaire de la semaine -->
-    <div id="home-benef-card" style="
-      background:linear-gradient(135deg,rgba(240,180,41,.15),rgba(240,180,41,.05));
-      border:2px solid rgba(240,180,41,.3);border-radius:20px;
-      padding:24px;margin-bottom:16px;position:relative;overflow:hidden;
-    ">
-      <!-- Fond décoratif -->
-      <div style="position:absolute;top:-20px;right:-20px;font-size:120px;opacity:.06;pointer-events:none">🏆</div>
-
-      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px">🏆 Bénéficiaire de la semaine</div>
-
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-        <div id="home-benef-avatar" style="width:56px;height:56px;border-radius:50%;background:rgba(240,180,41,.2);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--gold);flex-shrink:0">—</div>
+    <!-- Carte bénéficiaire + countdown -->
+    <div id="home-benef-card" style="background:linear-gradient(135deg,rgba(240,180,41,.12),rgba(240,180,41,.04));border:1.5px solid rgba(240,180,41,.25);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;right:-10px;font-size:80px;opacity:.05;pointer-events:none">🏆</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:2px">🏆 BÉNÉFICIAIRE</div>
+        <div id="home-countdown" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3)">⏳…</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div id="home-benef-nom" style="font-family:'Space Grotesk',sans-serif;font-size:28px;letter-spacing:2px;color:var(--gold);line-height:1">—</div>
-          <div id="home-benef-sem" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);margin-top:4px">—</div>
+          <div id="home-benef-nom" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--gold);letter-spacing:-.5px">—</div>
+          <div id="home-benef-sem" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">—</div>
         </div>
-        <div style="margin-left:auto;text-align:right">
-          <div id="home-benef-pot" style="font-family:'Space Grotesk',sans-serif;font-size:24px;color:var(--green);line-height:1">—</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">à recevoir</div>
+        <div style="text-align:right">
+          <div id="home-benef-pot" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:var(--green)">—</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3)">à recevoir</div>
         </div>
       </div>
-
-      <!-- Compte à rebours -->
-      <div id="home-countdown" style="background:rgba(0,0,0,.3);border-radius:12px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;margin-bottom:14px">
-        ⏳ Chargement…
-      </div>
-
-      <!-- Bouton notifier -->
-      <button onclick="switchTab('notifications', document.querySelector('[onclick*=notifications]'))" style="
-        width:100%;padding:12px;
-        background:linear-gradient(135deg,#25D366,#128C7E);
-        color:#fff;border:none;border-radius:12px;
-        font-family:'Space Grotesk',sans-serif;font-size:16px;letter-spacing:2px;
-        cursor:pointer;transition:all .2s;
-      " onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+      <button onclick="switchTab('notifications')" style="width:100%;margin-top:12px;padding:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;cursor:pointer">
         📱 NOTIFIER LE GROUPE
       </button>
     </div>
 
-    <!-- KPI rapides -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px;text-align:center">
-        <div id="home-kpi-payes" style="font-family:'Space Grotesk',sans-serif;font-size:28px;color:var(--green)">0</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px;margin-top:3px">PAYÉS</div>
+    <!-- KPI + barre progression (compact) -->
+    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:12px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:10px">
+        <div style="text-align:center;border-right:1px solid var(--b0)">
+          <div id="home-kpi-payes" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--green)">0</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px">PAYÉS</div>
+        </div>
+        <div style="text-align:center;border-right:1px solid var(--b0)">
+          <div id="home-kpi-attente" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--red)">0</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px">EN ATTENTE</div>
+        </div>
+        <div style="text-align:center">
+          <div id="home-kpi-progress" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--gold)">0%</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px">COLLECTÉ</div>
+        </div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px;text-align:center">
-        <div id="home-kpi-attente" style="font-family:'Space Grotesk',sans-serif;font-size:28px;color:var(--red)">0</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px;margin-top:3px">EN ATTENTE</div>
-      </div>
-      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px;text-align:center">
-        <div id="home-kpi-progress" style="font-family:'Space Grotesk',sans-serif;font-size:28px;color:var(--gold)">0%</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px;margin-top:3px">COLLECTÉ</div>
-      </div>
-    </div>
-
-    <!-- Barre de progression cotisations -->
-    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:1px">COTISATIONS SEMAINE</div>
-        <div id="home-cotis-lbl" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold)">0/0</div>
-      </div>
-      <div style="background:var(--s3);border-radius:99px;height:10px;overflow:hidden;margin-bottom:10px">
+      <div style="background:var(--s3);border-radius:99px;height:7px;overflow:hidden;margin-bottom:6px">
         <div id="home-cotis-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--gold));width:0%;transition:width .8s ease"></div>
       </div>
       <div style="display:flex;justify-content:space-between">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green)" id="home-cotis-recu">0 $ reçu</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--red)" id="home-cotis-manque">0 $ manquant</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--green)" id="home-cotis-recu">0 $ reçu</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3)" id="home-cotis-lbl">0/0</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--red)" id="home-cotis-manque">0 $ manquant</span>
       </div>
     </div>
 
-    <!-- Progression du cycle -->
-    <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:1px">PROGRESSION DU CYCLE</div>
-        <div id="home-cycle-lbl" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold)">0/35</div>
+    <!-- Cycle + actions rapides sur la même ligne -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <!-- Progression cycle -->
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:12px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px;margin-bottom:6px">CYCLE</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
+          <span id="home-cycle-lbl" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:var(--gold)">0/35</span>
+        </div>
+        <div style="background:var(--s3);border-radius:99px;height:5px;overflow:hidden;margin-bottom:5px">
+          <div id="home-cycle-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dark),var(--gold));width:0%;transition:width .8s ease"></div>
+        </div>
+        <div id="home-cycle-next" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
       </div>
-      <div style="background:var(--s3);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px">
-        <div id="home-cycle-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dark),var(--gold));width:0%;transition:width .8s ease"></div>
+
+      <!-- Actions rapides 2×2 compact -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button class="home-action-btn" onclick="switchTab('tracabilite')"><span style="font-size:18px">✅</span><span>Suivi</span></button>
+        <button class="home-action-btn" onclick="switchTab('calendrier')"><span style="font-size:18px">📅</span><span>Calendrier</span></button>
+        <button class="home-action-btn" onclick="switchTab('sanctions')"><span style="font-size:18px">⚖️</span><span>Amendes</span></button>
+        <button class="home-action-btn" onclick="switchTab('dashboard')"><span style="font-size:18px">📊</span><span>Stats</span></button>
       </div>
-      <div id="home-cycle-next" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3)">Prochain bénéficiaire : —</div>
     </div>
 
-    <!-- Actions rapides -->
-    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">⚡ Actions rapides</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      <button class="home-action-btn" onclick="switchTab('tracabilite', document.querySelector('[onclick*=tracabilite]'))">
-        <span style="font-size:24px">✅</span>
-        <span>Suivi des paiements</span>
-      </button>
-      <button class="home-action-btn" onclick="switchTab('calendrier', document.querySelector('[onclick*=calendrier]'))">
-        <span style="font-size:24px">📅</span>
-        <span>Calendrier</span>
-      </button>
-      <button class="home-action-btn" onclick="switchTab('sanctions', document.querySelector('[onclick*=sanctions]'))">
-        <span style="font-size:24px">⚖️</span>
-        <span>Sanctions</span>
-      </button>
-      <button class="home-action-btn" onclick="switchTab('dashboard', document.querySelector('[onclick*=dashboard]'))">
-        <span style="font-size:24px">📊</span>
-        <span>Dashboard</span>
-      </button>
-    </div>
-
-    <!-- Top membres en retard (si jeudi) -->
-    <div id="home-alert-section" style="display:none;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">🚨 Non payés aujourd'hui</div>
+    <!-- Alerte non payés (jeudi seulement) -->
+    <div id="home-alert-section" style="display:none;background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.2);border-radius:12px;padding:12px;margin-bottom:10px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1px;margin-bottom:8px">🚨 NON PAYÉS AUJOURD'HUI</div>
       <div id="home-unpaid-list"></div>
-      <button onclick="switchTab('notifications', document.querySelector('[onclick*=notifications]'))" style="width:100%;margin-top:10px;padding:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;color:var(--red);font-family:'Space Grotesk',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer">
+      <button onclick="switchTab('notifications')" style="width:100%;margin-top:8px;padding:9px;background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.25);border-radius:8px;color:var(--red);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;cursor:pointer">
         🚨 ENVOYER L'ALERTE
       </button>
     </div>
@@ -4732,53 +4817,88 @@ function loadFromFirebase() {
   if (!db) { showLoader(false); init(); return; }
   showLoader(true);
 
-  // ── 1. Chargement initial unique (once) — toute la base ──
+  // Timeout de sécurité — si Firebase ne répond pas en 8s → utiliser localStorage
+  const timeout = setTimeout(() => {
+    console.warn('⏱️ Firebase timeout — utilisation des données locales');
+    _loadFromLocal();
+    showLoader(false);
+    init();
+    setSyncStatus('error');
+    // Retry en arrière-plan après 5 secondes
+    setTimeout(() => {
+      db.ref('jeudi_cash').once('value').then(snap => {
+        if (snap.val()) { _applyFirebaseData(snap.val()); setSyncStatus('saved'); }
+      }).catch(()=>{});
+    }, 5000);
+  }, 8000);
+
   db.ref('jeudi_cash').once('value').then(snap => {
+    clearTimeout(timeout);
     const data = snap.val() || {};
-
-    const get = (key, fallback) => {
-      const val = data[key];
-      if (val !== undefined && val !== null) return val;
-      try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
-      catch { return fallback; }
-    };
-
-    COTISATION = +(get('jc2_cot', 200));
-    DEVISE     =   get('jc2_devise', '$ CAD');
-    startDate  =   get('jc2_start', '');
-
-    G = {
-      anc: {
-        members:  toArr(get('jc2_anc_members',  [])).filter(n=>n&&typeof n==='string'),
-        drawn:    toArr(get('jc2_anc_drawn',    [])),
-        schedule: toArr(get('jc2_anc_schedule', [])),
-      },
-      nouv: {
-        members:  toArr(get('jc2_nouv_members',  [])).filter(n=>n&&typeof n==='string'),
-        drawn:    toArr(get('jc2_nouv_drawn',    [])),
-        schedule: toArr(get('jc2_nouv_schedule', [])),
-      }
-    };
-    swapLog        = toArr(get('jc2_swaplog',    []));
-    memberDB       = toArr(get('jc2_memberdb',   []));
-    cotisWeek      = get('jc2_cotis_week',  null);
-    receptionsHist = toArr(get('jc2_recep_hist', []));
-    currentConfirm = get('jc2_cur_confirm', null);
-
-    // Cache localStorage
+    _applyFirebaseData(data);
     _cacheToLocal();
     showLoader(false);
     init();
-
-    // ── 2. Listeners CIBLÉS par nœud ──
     setupTargetedListeners();
 
   }).catch(err => {
-    console.warn('Firebase unreachable, using local data:', err);
+    clearTimeout(timeout);
+    console.warn('Firebase error:', err);
+    _loadFromLocal();
     showLoader(false);
     init();
     setSyncStatus('error');
   });
+}
+
+function _applyFirebaseData(data) {
+  const get = (key, fallback) => {
+    const val = data[key];
+    if (val !== undefined && val !== null) return val;
+    try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+    catch { return fallback; }
+  };
+
+  COTISATION = +(get('jc2_cot', 200));
+  DEVISE     =   get('jc2_devise', '$ CAD');
+  startDate  =   get('jc2_start', '');
+
+  G = {
+    anc: {
+      members:  toArr(get('jc2_anc_members',  [])).filter(n=>n&&typeof n==='string'),
+      drawn:    toArr(get('jc2_anc_drawn',    [])),
+      schedule: toArr(get('jc2_anc_schedule', [])),
+    },
+    nouv: {
+      members:  toArr(get('jc2_nouv_members',  [])).filter(n=>n&&typeof n==='string'),
+      drawn:    toArr(get('jc2_nouv_drawn',    [])),
+      schedule: toArr(get('jc2_nouv_schedule', [])),
+    }
+  };
+  swapLog        = toArr(get('jc2_swaplog',    []));
+  memberDB       = toArr(get('jc2_memberdb',   []));
+  cotisWeek      = get('jc2_cotis_week',  null);
+  receptionsHist = toArr(get('jc2_recep_hist', []));
+  currentConfirm = get('jc2_cur_confirm', null);
+}
+
+function _loadFromLocal() {
+  const get = (key, fallback) => {
+    try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+    catch { return fallback; }
+  };
+  COTISATION = +(get('jc2_cot', 200));
+  DEVISE     =   get('jc2_devise', '$ CAD');
+  startDate  =   get('jc2_start', '');
+  G = {
+    anc:  { members: toArr(get('jc2_anc_members',[])).filter(n=>n&&typeof n==='string'), drawn: toArr(get('jc2_anc_drawn',[])), schedule: toArr(get('jc2_anc_schedule',[])) },
+    nouv: { members: toArr(get('jc2_nouv_members',[])).filter(n=>n&&typeof n==='string'), drawn: toArr(get('jc2_nouv_drawn',[])), schedule: toArr(get('jc2_nouv_schedule',[])) }
+  };
+  swapLog        = toArr(get('jc2_swaplog',    []));
+  memberDB       = toArr(get('jc2_memberdb',   []));
+  cotisWeek      = get('jc2_cotis_week',  null);
+  receptionsHist = toArr(get('jc2_recep_hist', []));
+  currentConfirm = get('jc2_cur_confirm', null);
 }
 
 function _cacheToLocal() {
@@ -8684,25 +8804,21 @@ function renderTracabilite() {
   const filterM = (arr) => searchQ ? arr.filter(m=>m.name.toLowerCase().includes(searchQ)) : arr;
 
   const renderRow = (m) => {
-    const initials  = m.name.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
-    const avatarCls = m.groupe === 'anc' ? 'av-anc' : 'av-nouv';
-    const dbM       = memberDB.find(x=>x.nom===m.name||x.nom?.trim()===m.name.trim());
-    const tel       = (dbM?.tel||'').replace(/[^\d+]/g,'');
-    const paidTime  = m.paidAt ? m.paidAt.split(',')[0] : '';
+    const dbM    = memberDB.find(x=>x.nom===m.name||x.nom?.trim()===m.name.trim());
+    const tel    = (dbM?.tel||'').replace(/[^\d+]/g,'');
+    const paidAt = m.paidAt ? ' · ' + m.paidAt.split(' ')[0] : '';
+    const waMsg  = encodeURIComponent(`Bonjour ${m.name.split(' ')[0]},\n\n💳 Votre cotisation Jeudi Cash de ${COTISATION} ${DEVISE} est attendue aujourd'hui.\n\n_Jeudi Cash — Tontine officielle_`);
 
-    return `<div class="cotis-row ${m.paid?'paid':'unpaid'}" id="crow-${m.idx}-${m.groupe}" style="transition:all .25s">
-      ${canEdit ? `<button class="cotis-toggle" onclick="toggleCotis(${m.idx},'${m.groupe}')" id="ctog-${m.idx}-${m.groupe}">${m.paid?'✓':''}</button>` : `<span style="font-size:18px;flex-shrink:0">${m.paid?'✅':'○'}</span>`}
-      <div class="mn-avatar ${avatarCls}" style="width:34px;height:34px;font-size:12px;flex-shrink:0">${initials}</div>
-      <div style="flex:1;min-width:0">
-        <div class="cotis-name">${esc(m.name)}</div>
-        <div class="cotis-amount">${COTISATION} ${DEVISE}${paidTime?' · <span style="color:var(--green)">'+paidTime+'</span>':''}</div>
-      </div>
+    return `<div class="cotis-row ${m.paid?'paid':'unpaid'}" id="crow-${m.idx}-${m.groupe}">
+      ${canEdit
+        ? `<button class="cotis-toggle" onclick="toggleCotis(${m.idx},'${m.groupe}')" id="ctog-${m.idx}-${m.groupe}">${m.paid?'✓':''}</button>`
+        : `<span style="font-size:16px;flex-shrink:0">${m.paid?'✅':'⬜'}</span>`}
+      <span class="cotis-name">${esc(m.name)}</span>
       ${m.paid
-        ? `<span style="font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;background:var(--green-bg);border:1px solid rgba(0,200,150,.2);border-radius:99px;color:var(--green)">✓ Payé</span>`
+        ? `<span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--green);margin-left:auto;flex-shrink:0">${paidAt||'✓'}</span>`
         : tel
-          ? `<a href="https://wa.me/${tel}?text=${encodeURIComponent('Bonjour '+m.name.split(' ')[0]+',\n\n💳 Votre cotisation Jeudi Cash de '+COTISATION+' '+DEVISE+' est attendue aujourd\'hui.\n\n_Jeudi Cash — Tontine officielle_')}" style="display:inline-flex;padding:4px 8px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.15);border-radius:8px;color:#25D366;font-family:'JetBrains Mono',monospace;font-size:9px;text-decoration:none;flex-shrink:0">📱</a>`
-          : ''
-      }
+          ? `<a href="https://wa.me/${tel}?text=${waMsg}" style="margin-left:auto;flex-shrink:0;padding:4px 8px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.15);border-radius:8px;color:#25D366;font-family:'JetBrains Mono',monospace;font-size:9px;text-decoration:none">📱</a>`
+          : `<span style="margin-left:auto"></span>`}
     </div>`;
   };
 
@@ -9562,8 +9678,9 @@ ${benef ? `🏆 Bénéficiaire : *${benef.name}*
 ` : ''}Nous vous remercions d'effectuer votre virement dès aujourd'hui.
 
 💳 *Statut des cotisations (${COTISATION} ${DEVISE}/membre) :*
-✅ Reçus (${paid.length}) : ${paid.length ? paid.map(m=>m.name).join(', ') : '—'}
-⏳ En attente (${unpaid.length}) : ${unpaid.length ? unpaid.map(m=>m.name).join(', ') : 'Tous ont payé.'}
+✅ Payés (${paid.length}) :\n${paid.length ? paid.map(m=>`   ✅ ${m.name}`).join('\n') : '   Aucun encore'}
+
+❌ En attente (${unpaid.length}) :\n${unpaid.length ? unpaid.map(m=>`   ❌ ${m.name}`).join('\n') : '   Tout le monde a payé ! 🎉'}
 
 ${unpaid.length > 0 ? '⚠️ Nous comptons sur votre diligence.' : '🎉 Merci à tous pour votre ponctualité !'}
 
@@ -10153,7 +10270,7 @@ function genererResumeHebdo() {
     `\n📈 *Cotisations semaine #${String(cotisWeek?.weekNum||0).padStart(3,'0')} :*\n` +
     `✅ Payés : *${paid.length}/${allM.length}* (${pct}%)\n` +
     `❌ En attente : *${unpaid.length}*\n` +
-    (unpaid.length ? `\nNon payés : ${unpaid.map(m=>m.name).join(', ')}\n` : '') +
+    (unpaid.length ? `\n${unpaid.map(m=>`   ❌ ${m.name}`).join('\n')}\n` : '') +
     (sanctTotal ? `\n⚖️ Amendes cumulées : *${sanctTotal.toLocaleString('fr-CA')} ${DEVISE}*\n` : '') +
     `\n_Jeudi Cash — Tontine officielle_`;
 
