@@ -1280,6 +1280,39 @@ select{
   .nav-select-wrap{display:block;}
   .stat-val{font-size:16px;}
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FICHES MEMBRES — DB CARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.family-group{background:var(--s1);border:1px solid var(--b1);border-radius:16px;margin-bottom:8px;overflow:hidden;}
+.fg-anc{border-left:3px solid var(--gold);}
+.fg-nouv{border-left:3px solid var(--blue);}
+.family-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.family-header:hover{background:var(--s2);}
+.family-avatar-big{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;flex-shrink:0;}
+.family-name-big{font-weight:700;font-size:15px;letter-spacing:-.3px;}
+.family-meta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);margin-top:3px;line-height:1.5;}
+.family-count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);flex-shrink:0;}
+.family-toggle{font-size:11px;color:var(--t3);transition:transform .2s;flex-shrink:0;padding:4px;}
+.family-toggle.open{transform:rotate(180deg);}
+.family-places{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--b0);}
+.place-row{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid var(--b0);transition:background .1s;}
+.place-row:last-child{border-bottom:none;}
+.place-row:hover{background:var(--s2);}
+.place-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);min-width:16px;padding-top:2px;}
+.place-info{flex:1;min-width:0;}
+.place-name{font-weight:600;font-size:13px;letter-spacing:-.1px;margin-bottom:4px;}
+.place-detail{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);line-height:1.7;}
+.place-badges{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;}
+.place-actions{display:flex;gap:4px;flex-shrink:0;margin-top:2px;}
+.mc-btn{padding:5px 8px;border-radius:8px;border:1px solid var(--b1);background:var(--s2);color:var(--t2);cursor:pointer;font-size:13px;transition:all .15s;}
+.mc-btn:hover{background:var(--s3);color:var(--t1);}
+.mc-btn.del:hover{background:var(--red-bg);color:var(--red);border-color:rgba(255,77,77,.2);}
+.mc-badge{padding:2px 8px;border-radius:99px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3px;}
+.b-ok{background:rgba(0,200,150,.1);color:var(--green);border:1px solid rgba(0,200,150,.2);}
+.b-pending{background:rgba(240,180,41,.1);color:var(--gold);border:1px solid rgba(240,180,41,.2);}
+.b-late{background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2);}
+
 @keyframes tab-enter-right{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
 @keyframes tab-enter-left{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
 @keyframes tab-exit-left{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-20px)}}
@@ -1325,11 +1358,78 @@ select{
   .bottom-nav{display:none !important;}
   .container{padding-bottom:20px;}
   .dash-grid{grid-template-columns:1fr 1fr;}
+
+  /* ── Desktop layout — centré avec max-width ── */
+  body{background:var(--bg);}
+
+  header{
+    max-width:860px;margin:0 auto;
+    padding:28px 32px 20px;
+    text-align:left;
+    border-bottom:1px solid var(--b0);
+    background:linear-gradient(180deg,rgba(240,180,41,.03) 0%,transparent 100%);
+  }
+  h1{font-size:36px;}
+
+  /* Stats bar desktop */
+  .stats{
+    max-width:860px;margin:0 auto;
+    grid-template-columns:repeat(5,1fr);
+  }
+
+  /* Config bar desktop */
+  #cfg-bar{max-width:860px;margin:0 auto;}
+
+  /* Tabs desktop */
+  .tabs{max-width:860px;margin:0 auto;padding:0 8px;}
+
+  /* Nav select caché sur desktop */
+  .nav-select-wrap{display:none;}
+
+  /* Container panels */
+  .container{
+    max-width:860px;margin:0 auto;
+    padding:24px 32px 40px;
+  }
+
+  /* Tab panels ont du padding */
+  .tab-panel{padding:24px 0;}
+
+  /* 2 colonnes sur desktop pour certains panels */
+  #trac-panel-semaine .trac-week-card{
+    max-width:100%;
+  }
+
+  /* Sync status dans header */
+  #sync-status{font-size:11px;}
 }
-@media(max-width:380px){
-  .bottom-nav{grid-template-columns:repeat(5,1fr);}
-  .bn-label{font-size:7px;}
-  .bn-icon{font-size:18px;}
+
+@media(min-width:1100px){
+  header{max-width:1100px;}
+  .stats{max-width:1100px;}
+  #cfg-bar{max-width:1100px;}
+  .tabs{max-width:1100px;}
+  .container{max-width:1100px;padding:24px 40px 40px;}
+}
+
+@media(min-width:701px){
+  /* Home desktop — 2 colonnes */
+  #tab-home{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    align-items:start;
+  }
+  #home-benef-card{ grid-column:1/-1; }
+  #home-alert-section{ grid-column:1/-1; }
+
+  /* Suivi desktop — liste dans boîte plus haute */
+  #cotis-grid{ max-height:65vh !important; }
+
+  /* Dashboard 3 colonnes */
+  #tab-dashboard .dash-grid{
+    grid-template-columns:1fr 1fr 1fr;
+  }
 }
 @media(min-width:701px) and (max-width:900px){
   .dash-grid{grid-template-columns:1fr 1fr;}
