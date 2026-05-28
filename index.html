@@ -10082,36 +10082,52 @@ function sendResumeWA(e) {
 }
 
 function lancerRappelJeudi() {
-  const today = new Date();
-  const isJeudi = today.getDay() === 4;
+  // S'assurer que les données sont chargées
+  if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
 
-  if (!isJeudi) {
-    // Pas jeudi — demander confirmation
-    const next = new Date(today);
-    next.setDate(today.getDate() + ((4 - today.getDay() + 7) % 7 || 7));
-    const nextStr = next.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long'});
-    if (!window.confirm(`⚠️ Aujourd'hui n'est pas jeudi.\n\nVeux-tu quand même envoyer les rappels ?\n(Prochain jeudi : ${nextStr})`)) return;
-  }
+  const today    = new Date();
+  const isJeudi  = today.getDay() === 4;
+  const benef    = getCurrentWeekBenef();
+  const dateStr  = today.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  const benefDB  = benef ? memberDB.find(x=>x.nom===benef.name||x.nom?.trim()===benef.name?.trim()) : null;
+  const interac  = benefDB?.interac || benefDB?.tel || '';
+  const potStr   = benef ? potDuBenefStr(benef.name) : '';
+  const allM     = cotisWeek ? cotisWeek.membersState : [];
+  const paid     = allM.filter(m=>m.paid);
+  const unpaid   = allM.filter(m=>!m.paid);
+  const interacLine = interac ? `\n💳 *Interac : ${interac}*\n🔑 Question : JEUDI` : '';
 
-  // Générer le message groupe — si pas encore prêt, le construire maintenant
-  let msg = document.getElementById('wa-group-msg')?.textContent || '';
-  if (!msg || msg === 'Chargement...') {
-    // Forcer la génération du message
-    if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
-    renderNotifications();
-    msg = document.getElementById('wa-group-msg')?.textContent || '';
-  }
-  if (!msg || msg === 'Chargement...') {
-    // Construire un message minimal si les données ne sont pas encore là
-    const benef = getCurrentWeekBenef();
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
-    msg = `🏦 *JEUDI CASH*\n📅 ${dateStr}\n\n${benef?`🏆 Bénéficiaire : *${benef.name}*\n💰 Montant : *${potDuBenefStr(benef.name)}*\n\n`:''}Merci d'effectuer votre virement dès aujourd'hui.\n\n_Jeudi Cash — Tontine officielle_ 🏦`;
-  }
+  // Construire le message directement sans dépendre du DOM
+  const msg = `🏦 *JEUDI CASH — Semaine #${String(benef?.week||0).padStart(3,'0')}*
+📅 ${dateStr}
 
-  // Ouvrir WhatsApp avec le message groupe
+${benef ? `🏆 Bénéficiaire : *${benef.name}*
+💰 Montant : *${potStr}*${interacLine}
+` : ''}Nous vous remercions d'effectuer votre virement dès aujourd'hui.
+
+💳 *Statut des cotisations (${COTISATION} ${DEVISE}/membre) :*
+✅ Payés (${paid.length}) :
+${paid.length ? paid.map(m=>`   ✅ ${m.name}`).join('\n') : '   Aucun encore'}
+
+❌ En attente (${unpaid.length}) :
+${unpaid.length ? unpaid.map(m=>`   ❌ ${m.name}`).join('\n') : '   Tout le monde a payé ! 🎉'}
+
+${unpaid.length > 0 ? '⚠️ Nous comptons sur votre diligence.' : '🎉 Merci à tous pour votre ponctualité !'}
+
+_Jeudi Cash — Tontine officielle_ 🏦`;
+
+  // Mettre à jour l'aperçu
+  const preview = document.getElementById('wa-group-msg');
+  if (preview) preview.textContent = msg;
+
+  // Sauvegarder dans l'historique
+  const hist = JSON.parse(localStorage.getItem('jc2_alert_hist') || '[]');
+  hist.unshift({ type: 'Rappel jeudi matin', sentAt: new Date().toLocaleString('fr-CA'), count: allM.length });
+  localStorage.setItem('jc2_alert_hist', JSON.stringify(hist.slice(0,50)));
+
+  // Ouvrir WhatsApp
   window.location.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  toast('📱 WhatsApp ouvert ! Sélectionne ton groupe Jeudi Cash et appuie sur Envoyer ✅');
+  setTimeout(() => toast('📱 WhatsApp ouvert ! Sélectionne ton groupe Jeudi Cash'), 500);
 }
 
 function updateJeudiStatus() {
