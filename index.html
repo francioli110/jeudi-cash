@@ -5617,6 +5617,38 @@ function updateStats(){
 // ═══════════════════════════════════════
 //  CALENDAR
 // ═══════════════════════════════════════
+function buildRows(g, today) {
+  const sched  = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
+  const drawn  = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
+  const offset = g === 'nouv' ? (Array.isArray(G.anc.members)?G.anc.members:Object.values(G.anc.members||{})).filter(n=>n).length : 0;
+
+  return sched.map((s, i) => {
+    const weekNum  = offset + i + 1;
+    const iso      = s.iso || s.date || '';
+    const dateObj  = iso ? new Date(iso) : null;
+    const isPast   = dateObj ? dateObj < today : false;
+    const isCur    = (() => {
+      if (!dateObj) return false;
+      const mon = new Date(today); mon.setDate(today.getDate() - today.getDay() + 1);
+      const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
+      return dateObj >= mon && dateObj <= sun;
+    })();
+    const isDrawn  = drawn.includes(i) || drawn.includes(String(i));
+    const conf     = receptionsHist.find(r => r.weekNum === weekNum);
+    return {
+      week:      s.week || weekNum,
+      name:      s.name || null,
+      date:      s.date || '—',
+      iso,
+      idx:       i,
+      drawn:     isDrawn || !!s.name,
+      past:      isPast,
+      cur:       isCur,
+      confirmed: !!conf,
+    };
+  });
+}
+
 function renderCalendar(){
   const box   = document.getElementById('cal-content');
   const q     = (document.getElementById('cal-search')?.value||'').toLowerCase();
