@@ -11219,16 +11219,91 @@ document.getElementById('session-bar').style.display  = 'none';
 document.getElementById('main-app').style.display     = 'block';
 applyRolePermissions();
 
-// Attendre que tout soit chargé puis démarrer
-window.addEventListener('load', function() {
+
+// ═══════════════════════════════════════
+//  DÉMARRAGE ROBUSTE — iOS + Firebase
+// ═══════════════════════════════════════
+
+function demarrerApp() {
+  // 1. Charger depuis localStorage immédiatement (affichage instantané)
+  _loadFromLocal();
+  showLoader(false);
+  init(); // premier rendu avec données locales
+
+  // 2. Si Firebase disponible → charger les vraies données
   if (typeof firebase !== 'undefined' && db) {
-    loadFromFirebase();
+    setSyncStatus('loading');
+
+    // Timeout 10s
+    const tOut = setTimeout(() => {
+      console.warn('Firebase timeout');
+      setSyncStatus('error');
+      // Réessayer une fois
+      setTimeout(() => {
+        db.ref('jeudi_cash').once('value')
+          .then(s => { if(s.val()) { _applyFirebaseData(s.val()); _cacheToLocal(); buildCotisWeek(); renderAll(); setSyncStatus('saved'); }})
+          .catch(()=>{});
+      }, 5000);
+    }, 10000);
+
+    db.ref('jeudi_cash').once('value')
+      .then(snap => {
+        clearTimeout(tOut);
+        const data = snap.val();
+        if (data) {
+          _applyFirebaseData(data);
+          _cacheToLocal();
+        }
+        buildCotisWeek();
+        renderAll();
+        setSyncStatus('saved');
+        setupTargetedListeners();
+      })
+      .catch(err => {
+        clearTimeout(tOut);
+        console.warn('Firebase err:', err);
+        setSyncStatus('error');
+      });
   } else {
     setSyncStatus('offline');
-    showLoader(false);
-    init();
+    buildCotisWeek();
+    renderAll();
   }
-});
+}
+
+// Tout rendre après chargement des données
+function renderAll() {
+  // Normaliser membres
+  if (!Array.isArray(G.anc.members))  G.anc.members  = Object.values(G.anc.members||{}).filter(n=>n&&typeof n==='string');
+  if (!Array.isArray(G.nouv.members)) G.nouv.members = Object.values(G.nouv.members||{}).filter(n=>n&&typeof n==='string');
+  G.anc.members  = G.anc.members.filter(n=>n&&typeof n==='string');
+  G.nouv.members = G.nouv.members.filter(n=>n&&typeof n==='string');
+
+  if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
+
+  updateStats();
+  renderHome();
+  renderTracabilite();
+  renderNotifications();
+  generateResumeMsg();
+  renderCalendar();
+  renderDB();
+  renderGrid('anc'); renderGrid('nouv');
+  updateTirageUI('anc'); updateTirageUI('nouv');
+  renderChips('anc'); renderChips('nouv');
+  renderSwapLog();
+  renderDashboard();
+  renderBackupList();
+  initProfilSelect();
+  setTimeout(updateDiagStatus, 500);
+}
+
+// Démarrer quand la page est prête
+if (document.readyState === 'complete') {
+  demarrerApp();
+} else {
+  window.addEventListener('load', demarrerApp);
+}
 </script>
 </body>
 </html>
