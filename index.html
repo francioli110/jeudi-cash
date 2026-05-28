@@ -1413,22 +1413,15 @@ select{
 }
 
 @media(min-width:701px){
-  /* Home desktop — 2 colonnes */
-  #tab-home{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-    align-items:start;
-  }
-  #home-benef-card{ grid-column:1/-1; }
-  #home-alert-section{ grid-column:1/-1; }
+  /* Home desktop — limiter la largeur et centrer */
+  #tab-home{ max-width:700px; }
 
   /* Suivi desktop — liste dans boîte plus haute */
   #cotis-grid{ max-height:65vh !important; }
 
-  /* Dashboard 3 colonnes */
+  /* Dashboard 2 colonnes propres */
   #tab-dashboard .dash-grid{
-    grid-template-columns:1fr 1fr 1fr;
+    grid-template-columns:1fr 1fr;
   }
 }
 @media(min-width:701px) and (max-width:900px){
@@ -5469,6 +5462,10 @@ function updateStats(){
   document.getElementById('st-pot').textContent=totalPot();
   document.getElementById('st-done').textContent=`${totalDone()}/${totalMembers()}`;
   document.getElementById('header-sub').textContent=`${G.anc.members.length} Anciens · ${G.nouv.members.length} Nouveaux · ${COTISATION} ${DEVISE}/sem.`;
+  // Refresh home if active
+  if (document.getElementById('tab-home')?.classList.contains('active')) {
+    renderHome();
+  }
 }
 
 // ═══════════════════════════════════════
@@ -9787,7 +9784,17 @@ function openSMS(tel, msg) {
   window.location.href = 'sms:' + cleanTel(tel) + sep + 'body=' + encodeURIComponent(msg);
 }
 function openGroupWA() {
-  const msg = document.getElementById('wa-group-msg')?.textContent || '';
+  let msg = document.getElementById('wa-group-msg')?.textContent || '';
+  if (!msg || msg === 'Chargement...') {
+    if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
+    renderNotifications();
+    msg = document.getElementById('wa-group-msg')?.textContent || '';
+  }
+  if (!msg || msg === 'Chargement...') {
+    const benef   = getCurrentWeekBenef();
+    const dateStr = new Date().toLocaleDateString('fr-CA',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    msg = `🏦 *JEUDI CASH*\n📅 ${dateStr}\n\n${benef?`🏆 Bénéficiaire : *${benef.name}*\n💰 Montant : *${potDuBenefStr(benef.name)}*\n\n`:''}Merci d'effectuer votre virement dès aujourd'hui.\n\n_Jeudi Cash — Tontine officielle_ 🏦`;
+  }
   window.location.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
 }
 
@@ -9797,6 +9804,9 @@ function renderNotifications() {
   if (!Array.isArray(G.nouv.members)) G.nouv.members = Object.values(G.nouv.members||{}).filter(n=>n&&typeof n==='string');
   G.anc.members  = G.anc.members.filter(n=>n&&typeof n==='string');
   G.nouv.members = G.nouv.members.filter(n=>n&&typeof n==='string');
+
+  // S'assurer que cotisWeek est construit
+  if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
 
   const benef   = getCurrentWeekBenef();
   const today   = new Date();
@@ -10083,11 +10093,20 @@ function lancerRappelJeudi() {
     if (!window.confirm(`⚠️ Aujourd'hui n'est pas jeudi.\n\nVeux-tu quand même envoyer les rappels ?\n(Prochain jeudi : ${nextStr})`)) return;
   }
 
-  // Générer le message groupe
-  const msg = document.getElementById('wa-group-msg')?.textContent || '';
+  // Générer le message groupe — si pas encore prêt, le construire maintenant
+  let msg = document.getElementById('wa-group-msg')?.textContent || '';
   if (!msg || msg === 'Chargement...') {
-    toast('⚠️ Message non encore généré, attends 1 seconde', true);
-    return;
+    // Forcer la génération du message
+    if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
+    renderNotifications();
+    msg = document.getElementById('wa-group-msg')?.textContent || '';
+  }
+  if (!msg || msg === 'Chargement...') {
+    // Construire un message minimal si les données ne sont pas encore là
+    const benef = getCurrentWeekBenef();
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+    msg = `🏦 *JEUDI CASH*\n📅 ${dateStr}\n\n${benef?`🏆 Bénéficiaire : *${benef.name}*\n💰 Montant : *${potDuBenefStr(benef.name)}*\n\n`:''}Merci d'effectuer votre virement dès aujourd'hui.\n\n_Jeudi Cash — Tontine officielle_ 🏦`;
   }
 
   // Ouvrir WhatsApp avec le message groupe
@@ -10139,14 +10158,31 @@ function updateJeudiStatus() {
   }
 }
 
+function getGroupMsg() {
+  let msg = document.getElementById('wa-group-msg')?.textContent || '';
+  if (!msg || msg === 'Chargement...') {
+    if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
+    renderNotifications();
+    msg = document.getElementById('wa-group-msg')?.textContent || '';
+  }
+  if (!msg || msg === 'Chargement...') {
+    const benef   = getCurrentWeekBenef();
+    const dateStr = new Date().toLocaleDateString('fr-CA',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    const benefDB = benef ? memberDB.find(x=>x.nom===benef.name||x.nom?.trim()===benef.name?.trim()) : null;
+    const interac = benefDB?.interac || benefDB?.tel || '';
+    msg = `🏦 *JEUDI CASH*\n📅 ${dateStr}\n\n${benef?`🏆 Bénéficiaire : *${benef.name}*\n💰 Montant : *${potDuBenefStr(benef.name)}*\n${interac?`💳 Interac : *${interac}*\n`:''}`:''}\nMerci d'effectuer votre virement dès aujourd'hui.\n\n_Jeudi Cash — Tontine officielle_ 🏦`;
+  }
+  return msg;
+}
+
 function copyGroupMsg() {
-  const msg = document.getElementById('wa-group-msg').textContent;
+  const msg = getGroupMsg();
   copyText(msg);
   toast('📋 Message copié ! Colle-le dans ton groupe WhatsApp');
 }
 
 function sendGroupWhatsApp() {
-  const msg = document.getElementById('wa-group-msg').textContent;
+  const msg = getGroupMsg();
   window.location.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
 }
 function switchTabMobile(name, btn) {
