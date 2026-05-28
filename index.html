@@ -4996,20 +4996,27 @@ function envoyerConfirmationWA() {
 }
 
 function loadFromFirebase() {
-  if (!db) { showLoader(false); init(); return; }
+  if (!db) { showLoader(false); init(); setTimeout(generateResumeMsg,500); return; }
   showLoader(true);
 
-  // Timeout de sécurité — si Firebase ne répond pas en 8s → utiliser localStorage
   const timeout = setTimeout(() => {
-    console.warn('⏱️ Firebase timeout — utilisation des données locales');
+    console.warn('⏱️ Firebase timeout — données locales');
     _loadFromLocal();
     showLoader(false);
     init();
     setSyncStatus('error');
-    // Retry en arrière-plan après 5 secondes
+    setTimeout(generateResumeMsg, 300);
+    // Retry en arrière-plan
     setTimeout(() => {
       db.ref('jeudi_cash').once('value').then(snap => {
-        if (snap.val()) { _applyFirebaseData(snap.val()); setSyncStatus('saved'); }
+        if (snap.val()) {
+          _applyFirebaseData(snap.val());
+          _cacheToLocal();
+          buildCotisWeek();
+          renderHome(); renderTracabilite(); renderNotifications();
+          generateResumeMsg();
+          setSyncStatus('saved');
+        }
       }).catch(()=>{});
     }, 5000);
   }, 8000);
@@ -5022,6 +5029,7 @@ function loadFromFirebase() {
     showLoader(false);
     init();
     setupTargetedListeners();
+    setTimeout(generateResumeMsg, 400);
 
   }).catch(err => {
     clearTimeout(timeout);
@@ -5030,6 +5038,7 @@ function loadFromFirebase() {
     showLoader(false);
     init();
     setSyncStatus('error');
+    setTimeout(generateResumeMsg, 300);
   });
 }
 
@@ -10118,7 +10127,12 @@ function generateResumeMsg() {
 
   const allM = cotisWeek ? cotisWeek.membersState : [];
   if (!allM.length) {
-    box.textContent = 'Aucun membre — vérifiez que Firebase est connecté.';
+    // Sur iPhone Firebase peut être lent — réessayer dans 2 secondes
+    box.textContent = 'Chargement des membres…';
+    setTimeout(() => {
+      if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
+      if (cotisWeek?.membersState?.length) generateResumeMsg();
+    }, 2000);
     return;
   }
 
