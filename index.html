@@ -635,22 +635,45 @@ select{
   display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;
 }
 .cal-scroll{overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--b0);}
-.cal-table{border-collapse:collapse;width:100%;min-width:500px;}
+.cal-table{border-collapse:collapse;width:100%;min-width:400px;}
 .cal-table th{
-  padding:10px 12px;background:var(--s2);
+  padding:9px 10px;background:var(--s2);
   font-family:'JetBrains Mono',monospace;font-size:9px;
   color:var(--t3);letter-spacing:1px;text-transform:uppercase;
-  text-align:left;border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:1;
+  text-align:left;border-bottom:1px solid var(--b1);white-space:nowrap;
 }
 .cal-table td{
-  padding:10px 12px;border-bottom:1px solid var(--b0);
-  font-size:13px;transition:background .1s;
+  padding:9px 10px;border-bottom:1px solid var(--b0);
+  font-size:13px;transition:background .1s;vertical-align:middle;
 }
 .cal-table tr:hover td{background:var(--s2);}
 .cal-table tr:last-child td{border-bottom:none;}
 .cal-week{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);}
-.cal-name{font-weight:600;letter-spacing:-.2px;}
-.cal-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);}
+.cal-name{font-weight:600;letter-spacing:-.2px;white-space:nowrap;}
+.cal-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);white-space:nowrap;}
+
+/* Calendar mobile — cartes au lieu du tableau */
+@media(max-width:700px){
+  .cal-scroll{ border:none; }
+  .cal-table{ min-width:unset;width:100%; }
+  .cal-table thead{ display:none; }
+  .cal-table tbody tr{
+    display:flex;flex-wrap:wrap;gap:4px;
+    background:var(--s2);border:1px solid var(--b0);
+    border-radius:10px;padding:10px 12px;
+    margin-bottom:6px;align-items:center;
+  }
+  .cal-table td{
+    border:none;padding:0;font-size:12px;
+  }
+  .cal-table td:first-child{
+    font-family:'JetBrains Mono',monospace;font-size:10px;
+    color:var(--gold);font-weight:700;
+  }
+  .cal-table td:nth-child(2){ color:var(--t3);font-size:11px; }
+  .cal-table td:nth-child(3){ font-weight:700;font-size:13px;flex:1; }
+  .cal-table td:last-child{ margin-left:auto; }
+}
 .cal-badge{
   display:inline-flex;align-items:center;gap:4px;
   padding:3px 8px;border-radius:99px;
@@ -2783,11 +2806,34 @@ select{
         <!-- Compte à rebours -->
         <div id="tr-countdown" style="font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;margin-top:8px;padding:8px;background:var(--s3);border-radius:8px;letter-spacing:1px;"></div>
 
-        <!-- Liste membres -->
-        <div class="cotis-grid" id="cotis-grid" style="margin-top:14px">
-          <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">⏳</div>
-            <p>Ajoutez des membres pour activer le suivi.</p>
+        <!-- Liste membres dans une boîte scrollable fixe -->
+        <div style="
+          border:1px solid var(--b1);border-radius:12px;
+          overflow:hidden;margin-top:14px;
+        ">
+          <!-- Header de la boîte -->
+          <div style="
+            display:flex;align-items:center;justify-content:space-between;
+            padding:10px 14px;background:var(--s3);border-bottom:1px solid var(--b1);
+          ">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px">LISTE DES COTISATIONS</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="tr-collected" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green)">0 $</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3)">·</span>
+              <span id="tr-remaining" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--red)">0 $ restant</span>
+              <span id="tr-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);margin-left:4px">0%</span>
+            </div>
+          </div>
+          <!-- Zone scrollable -->
+          <div class="cotis-grid" id="cotis-grid" style="
+            max-height:55vh;overflow-y:auto;
+            padding:8px;
+            scrollbar-width:thin;scrollbar-color:var(--b2) transparent;
+          ">
+            <div class="empty-state" style="grid-column:1/-1">
+              <div class="empty-icon">⏳</div>
+              <p>Ajoutez des membres pour activer le suivi.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -5329,55 +5375,62 @@ function updateStats(){
 //  CALENDAR
 // ═══════════════════════════════════════
 function renderCalendar(){
-  const box=document.getElementById('cal-content'),q=(document.getElementById('cal-search')?.value||'').toLowerCase(),today=new Date();
-  if(!G.anc.schedule.length&&G.anc.members.length)rebuildSchedule('anc');
-  if(!G.nouv.schedule.length&&G.nouv.members.length)rebuildSchedule('nouv');
-  const ancRows=buildRows('anc',today),nouvRows=buildRows('nouv',today);
-  if(!ancRows.length&&!nouvRows.length){box.innerHTML=emptyState("calendrier","Calendrier vide","Effectuez le tirage pour générer les 35 semaines.");return;}
-  const fr=r=>!q||(r.name||'').toLowerCase().includes(q)||String(r.week).includes(q)||r.date.toLowerCase().includes(q);
-  const fA=ancRows.filter(fr),fN=nouvRows.filter(fr);
-  if(!fA.length&&!fN.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><p>Aucun résultat pour "<b>${esc(q)}</b>"</p></div>`;return;}
-  let html=`<table><thead><tr><th>Sem.</th><th>Date du jeudi</th><th>Gagnant(e)</th><th>Groupe</th><th>Montant</th><th>Statut</th></tr></thead><tbody>`;
-  if(fA.length){html+=`<tr class="sep-row"><td colspan="6"><span class="sep-label sep-ancien">⭐ ANCIENS MEMBRES — Semaines 1 à ${G.anc.members.length}</span></td></tr>`;fA.forEach(r=>{html+=calRow(r,'anc');});}
-  if(fN.length){const s=G.anc.members.length+1,e=G.anc.members.length+G.nouv.members.length;html+=`<tr class="sep-row"><td colspan="6"><span class="sep-label sep-nouveau">🆕 NOUVEAUX MEMBRES — Semaines ${s} à ${e}</span></td></tr>`;fN.forEach(r=>{html+=calRow(r,'nouv');});}
-  box.innerHTML=html+'</tbody></table>';
-}
-function buildRows(g,today){
-  const { monday, sunday } = getCurrentWeekBounds();
-  const todayMid = new Date(today); todayMid.setHours(0,0,0,0);
-  return (Array.isArray(G[g].schedule)?G[g].schedule:Object.values(G[g].schedule||{})).map(s=>{
-    const d=s.iso?new Date(s.iso):null;
-    const dMid=d?new Date(d):null; if(dMid)dMid.setHours(0,0,0,0);
-    const isD=s.idx!==null&&s.idx!==undefined&&(Array.isArray(G[g].drawn)?G[g].drawn:Object.values(G[g].drawn||{})).includes(s.idx);
-    const isCurrent = d && d >= monday && d <= sunday;
-    const isPast = dMid && dMid <= todayMid;
-    // Vérifier confirmation
-    const confirmed = receptionsHist.find(r=>
-      r.weekNum===s.week &&
-      (r.benefName===s.name || r.benefName?.trim()===s.name?.trim())
-    );
-    return{week:s.week,date:s.date||'—',name:s.name||null,drawn:isD,past:isPast,cur:isCurrent,confirmed};
-  });
+  const box   = document.getElementById('cal-content');
+  const q     = (document.getElementById('cal-search')?.value||'').toLowerCase();
+  const today = new Date();
+  if(!G.anc.schedule.length && G.anc.members.length)  rebuildSchedule('anc');
+  if(!G.nouv.schedule.length && G.nouv.members.length) rebuildSchedule('nouv');
+  const ancRows = buildRows('anc', today);
+  const nouvRows= buildRows('nouv', today);
+  if(!ancRows.length && !nouvRows.length){
+    box.innerHTML = emptyState("calendrier","Calendrier vide","Effectuez le tirage pour générer les 35 semaines.");
+    return;
+  }
+  const fr = r => !q||(r.name||'').toLowerCase().includes(q)||String(r.week).includes(q)||r.date.toLowerCase().includes(q);
+  const fA = ancRows.filter(fr), fN = nouvRows.filter(fr);
+  if(!fA.length && !fN.length){
+    box.innerHTML = emptyState('recherche','Aucun résultat','Aucun résultat pour "'+esc(q)+'".');
+    return;
+  }
+  let html = '';
+  if(fA.length){
+    html += '<div style="font-family:'+"'JetBrains Mono',monospace"+';font-size:9px;color:var(--gold);letter-spacing:2px;margin:4px 0 8px">⭐ ANCIENS — Semaines 1 à '+G.anc.members.length+'</div>';
+    fA.forEach(r => { html += calCard(r, 'anc'); });
+  }
+  if(fN.length){
+    const s = G.anc.members.length + 1;
+    const e = G.anc.members.length + G.nouv.members.length;
+    html += '<div style="font-family:'+"'JetBrains Mono',monospace"+';font-size:9px;color:var(--blue);letter-spacing:2px;margin:12px 0 8px">🆕 NOUVEAUX — Semaines '+s+' à '+e+'</div>';
+    fN.forEach(r => { html += calCard(r, 'nouv'); });
+  }
+  box.innerHTML = html;
 }
 
-function calRow(r,g){
-  let sc='s-upcoming',st='À venir';
-  if(r.drawn && r.confirmed){sc='s-paid';st='✅ Bouffé';}
-  else if(r.drawn && r.past){sc='s-paid';st='Tiré · Passé';}
-  else if(r.drawn){sc='s-pending';st='Tiré ⏳';}
-  else if(r.cur){sc='s-current';st='Cette sem.';}
-  const cc=(r.cur&&!r.drawn)?'current-row':'';
-  const badge=g==='anc'?'<span class="badge b-ancien">Ancien</span>':'<span class="badge b-nouveau">Nouveau</span>';
-  // Pot personnalisé selon la famille du bénéficiaire
-  const pot    = r.name ? potDuBenefStr(r.name) : '—';
-  const cotis  = r.name ? nbCotisants(r.name) : '—';
-  const fam    = r.name ? getFamille(r.name) : null;
-  const famTip = fam && fam.membres.length > 1 ? ` <span style="font-size:9px;color:var(--t3)">(${cotis} cotisants)</span>` : '';
-  const nameHtml = r.name
-    ? `${r.confirmed?'✅':'🏆'} ${esc(r.name)}${r.confirmed?` <span style="font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace">· Confirmé</span>`:''}${famTip}`
-    : `<span style="color:var(--muted)">—</span>`;
-  return`<tr class="${cc}"><td><span class="week-num" style="color:${g==='anc'?'var(--ancien)':'var(--nouveau)'}">#${String(r.week).padStart(3,'0')}</span></td><td><span class="date-cell">${r.date}</span></td><td class="name-cell">${nameHtml}</td><td>${badge}</td><td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green)">${r.name?pot:'—'}</span></td><td><span class="status-badge ${sc}">${st}</span></td></tr>`;
+function calCard(r, g){
+  let statusColor='var(--t3)', statusTxt='À venir', statusBg='var(--s3)';
+  if(r.confirmed)          { statusColor='var(--green)'; statusTxt='✅ Bouffé'; statusBg='rgba(0,200,150,.08)'; }
+  else if(r.drawn&&r.past) { statusColor='var(--t3)';    statusTxt='Passé';     statusBg='var(--s3)'; }
+  else if(r.drawn)         { statusColor='var(--gold)';  statusTxt='⏳ Tiré';   statusBg='rgba(240,180,41,.08)'; }
+  else if(r.cur)           { statusColor='var(--blue)';  statusTxt='● Cette sem.';statusBg='rgba(79,142,247,.08)'; }
+  const numColor = g==='anc' ? 'var(--gold)' : 'var(--blue)';
+  const pot   = r.name ? potDuBenefStr(r.name) : '';
+  const cotis = r.name ? nbCotisants(r.name) : '';
+  const fam   = r.name ? getFamille(r.name) : null;
+  const hasFam= fam && fam.membres.length > 1;
+  const isCur = r.cur && !r.confirmed;
+  return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:${isCur?'rgba(79,142,247,.05)':'var(--s2)'};border:1px solid ${isCur?'rgba(79,142,247,.2)':'var(--b0)'};margin-bottom:4px">
+    <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:${numColor};min-width:34px;flex-shrink:0">#${String(r.week).padStart(3,'0')}</div>
+    <div style="flex:1;min-width:0;overflow:hidden">
+      <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name?esc(r.name):'<span style="color:var(--t3)">—</span>'}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.date}${hasFam?' · '+cotis+' cotisants':''}</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);font-weight:600">${pot}</div>
+      <div style="margin-top:3px;font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:99px;display:inline-block;background:${statusBg};color:${statusColor}">${statusTxt}</div>
+    </div>
+  </div>`;
 }
+
 function exportCSV(){
   const today=new Date();
   let csv='Semaine,Date,Gagnant,Groupe,Montant,Cotisants,Statut\n';
