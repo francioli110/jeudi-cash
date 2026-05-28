@@ -8590,87 +8590,6 @@ function getScoreData() {
     return { nom:m.nom, groupe:m.groupe, dbM, score, tauxPaiement, ponctualite, paidCount, totalTracked, badge, badgeClass, cardClass, hist, curPaid };
   });
 }
-
-function renderScores() {
-  const box = document.getElementById('scores-list');
-  if (!box) return;
-  const fg   = document.getElementById('score-filter-groupe')?.value || '';
-  const sort = document.getElementById('score-filter-sort')?.value || 'score';
-  let data = getScoreData();
-  if (fg) data = data.filter(d => d.groupe === fg);
-  if (sort === 'score')   data.sort((a,b) => b.score - a.score);
-  if (sort === 'nom')     data.sort((a,b) => a.nom.localeCompare(b.nom));
-  if (sort === 'retards') data.sort((a,b) => a.tauxPaiement - b.tauxPaiement);
-
-  if (!data.length) { box.innerHTML = `<div class="empty-state"><div class="empty-icon">🏅</div><p>Aucun membre.</p></div>`; return; }
-
-  const isIOS  = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  box.innerHTML = data.map((d, rank) => {
-    const initials = d.nom.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
-    const avatarCls= d.groupe==='anc'?'av-anc':'av-nouv';
-    const tel      = (d.dbM?.tel||'').replace(/[^\d+]/g,'');
-    const scoreColor = d.score>=90?'var(--gold)':d.score>=75?'var(--green)':d.score>=50?'var(--orange)':'var(--red)';
-    const histDots = d.hist.slice(0,8).map((h,i) =>
-      `<div class="score-dot ${h}" title="Sem.${d.totalTracked-i}: ${h==='paid'?'✅ Payé':h==='unpaid'?'❌ Non payé':'—'}"></div>`
-    ).join('');
-    const msgRelance = `Bonjour ${d.nom.split(' ')[0]},\n\n📊 Score de ponctualité : *${d.score}/100* (${d.tauxPaiement}% à jour)\n\nNous comptons sur votre régularité pour le bon fonctionnement de la tontine.\n\n_Jeudi Cash — Tontine officielle_ 🏦`;
-    const waBtn = tel && d.score < 75 ? `<a href="https://wa.me/${tel}?text=${encodeURIComponent(msgRelance)}" class="notif-btn-wa" style="text-decoration:none;font-size:11px;padding:6px 12px">📱 Motiver</a>` : '';
-
-    return `
-      <div class="score-card ${d.cardClass}">
-        <div class="score-header">
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;color:${scoreColor};min-width:32px;text-align:center">#${rank+1}</div>
-          <div class="score-avatar ${avatarCls}">${initials}</div>
-          <div style="flex:1">
-            <div class="score-name">${esc(d.nom)} ${d.curPaid?'<span style="color:var(--green);font-size:11px">✅</span>':''}</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3)">${d.groupe==='anc'?'⭐ Ancien':'🆕 Nouveau'}</div>
-          </div>
-          <span class="score-badge ${d.badgeClass}">${d.badge}</span>
-        </div>
-
-        <div class="score-bar-wrap">
-          <div class="score-bar-label"><span>🏅 Score global</span><span style="color:${scoreColor};font-weight:700">${d.score}/100</span></div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:${d.score}%;background:${scoreColor}"></div></div>
-        </div>
-
-        <div class="score-metrics">
-          <div class="score-metric">
-            <div class="score-metric-val" style="color:${scoreColor}">${d.score}</div>
-            <div class="score-metric-lbl">Score global</div>
-          </div>
-          <div class="score-metric">
-            <div class="score-metric-val" style="color:${d.tauxPaiement>=80?'var(--green)':d.tauxPaiement>=60?'var(--orange)':'var(--red)'}">${d.tauxPaiement}%</div>
-            <div class="score-metric-lbl">Taux paiement</div>
-          </div>
-          <div class="score-metric">
-            <div class="score-metric-val" style="color:${d.ponctualite>=80?'var(--green)':d.ponctualite>=60?'var(--orange)':'var(--red)'}">${d.ponctualite}%</div>
-            <div class="score-metric-lbl">Ponctualité</div>
-          </div>
-        </div>
-
-        <div class="score-bar-wrap">
-          <div class="score-bar-label"><span>💰 Taux de paiement</span><span>${d.paidCount}/${d.totalTracked}</span></div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:${d.tauxPaiement}%;background:${d.tauxPaiement>=80?'var(--green)':d.tauxPaiement>=60?'var(--orange)':'var(--red)'}"></div></div>
-        </div>
-        <div class="score-bar-wrap">
-          <div class="score-bar-label"><span>⏱ Ponctualité</span><span>${d.ponctualite}%</span></div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:${d.ponctualite}%;background:${d.ponctualite>=80?'var(--green)':d.ponctualite>=60?'var(--orange)':'var(--red)'}"></div></div>
-        </div>
-
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);margin-top:10px;margin-bottom:5px">📅 HISTORIQUE PAIEMENTS</div>
-        <div class="score-hist-dots">${histDots||'<span style="font-size:9px;color:var(--t3);font-family:\'DM Mono\'">Pas encore d\'historique</span>'}</div>
-        <div style="display:flex;gap:10px;margin-top:5px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3)"><span style="display:inline-block;width:9px;height:9px;background:var(--green);border-radius:2px;vertical-align:middle;margin-right:2px"></span>Payé</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t3)"><span style="display:inline-block;width:9px;height:9px;background:var(--red);border-radius:2px;vertical-align:middle;margin-right:2px"></span>Non payé</span>
-        </div>
-
-        ${waBtn ? `<div style="margin-top:10px;border-top:1px solid var(--b1);padding-top:10px">${waBtn}</div>` : ''}
-      </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════
-//  ALERTES INTELLIGENTES
 // ═══════════════════════════════════════
 function renderAlertes() {
   // Statut
@@ -8725,20 +8644,6 @@ function envoyerAlerte20h() {
   window.location.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
   toast(`🚨 Alerte envoyée — ${unpaid.length} membres non payés !`);
 }
-
-function activerAlerteAuto() {
-  if (!('Notification' in window)) { toast('⚠️ Notifications non supportées', true); return; }
-  Notification.requestPermission().then(perm => {
-    if (perm === 'granted') {
-      localStorage.setItem('jc2_alerte_auto', '1');
-      const btn = document.getElementById('btn-alerte-auto');
-      if (btn) { btn.textContent = '✅ RAPPEL AUTO ACTIVÉ'; btn.style.color='var(--green)'; btn.style.borderColor='var(--green)'; }
-      toast('✅ Tu recevras une notification chaque jeudi à 20h !');
-      planifierAlerteAuto();
-    } else { toast('⚠️ Active les notifications dans les réglages de ton téléphone', true); }
-  });
-}
-
 function planifierAlerteAuto() {
   setInterval(() => {
     if (localStorage.getItem('jc2_alerte_auto') !== '1') return;
