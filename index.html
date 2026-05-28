@@ -525,6 +525,90 @@ label{
   background:var(--gold-subtle);border-color:var(--gold-border);color:var(--gold);
 }
 
+/* ─── Tirage cards ─── */
+.tirage-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.tirage-card{
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:16px;padding:16px;position:relative;overflow:hidden;
+}
+.ancien-card{border-top:3px solid var(--gold);}
+.nouveau-card{border-top:3px solid var(--blue);}
+.tirage-label{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;margin-bottom:12px;font-weight:700;
+}
+.ancien-card .tirage-label{color:var(--gold);}
+.nouveau-card .tirage-label{color:var(--blue);}
+.drum{
+  background:var(--s2);border-radius:14px;
+  padding:24px 12px;text-align:center;cursor:pointer;
+  transition:all .2s;margin-bottom:12px;
+  border:2px solid var(--b1);
+}
+.drum:hover{transform:scale(1.02);}
+.ancien-border{border-color:rgba(240,180,41,.3);}
+.ancien-border:hover{background:rgba(240,180,41,.08);border-color:var(--gold);}
+.drum-nouveau{border-color:rgba(79,142,247,.3);}
+.drum-nouveau:hover{background:rgba(79,142,247,.08);border-color:var(--blue);}
+.drum-name{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:clamp(16px,4vw,24px);letter-spacing:1px;
+  color:var(--t1);line-height:1.1;margin-bottom:4px;
+  word-break:break-word;
+}
+.drum-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--t3);letter-spacing:1px;
+}
+.tirage-result{margin-bottom:10px;}
+.winner-box{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:15px;color:var(--gold);text-align:center;
+  padding:8px;background:var(--gold-subtle);
+  border:1px solid var(--gold-border);border-radius:10px;
+  min-height:36px;display:flex;align-items:center;justify-content:center;
+}
+.winner-sub{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--t3);text-align:center;margin-top:4px;
+}
+.prog-wrap{
+  background:var(--s3);border-radius:99px;height:6px;
+  overflow:hidden;margin:8px 0 4px;
+}
+.prog-bar{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold-dark),var(--gold));
+  transition:width .5s ease;
+}
+.nouveau-card .prog-bar{background:linear-gradient(90deg,var(--blue),#7AB3FF);}
+.prog-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--t3);text-align:center;letter-spacing:.5px;margin-bottom:8px;
+}
+.chips-title{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--t3);letter-spacing:.5px;margin:8px 0 5px;
+}
+.chips{display:flex;flex-wrap:wrap;gap:4px;max-height:80px;overflow-y:auto;}
+.chip{
+  padding:3px 8px;border-radius:99px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  background:var(--s2);border:1px solid var(--b1);color:var(--t3);
+}
+.chip.done{
+  background:var(--gold-subtle);border-color:var(--gold-border);color:var(--gold);
+}
+.nouveau-card .chip.done{
+  background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.25);color:var(--blue);
+}
+.btn-outline-blue{
+  background:transparent;color:var(--blue);
+  border:1px solid rgba(79,142,247,.3);
+}
+.btn-outline-blue:hover{background:rgba(79,142,247,.1);}
+@media(max-width:480px){.tirage-grid{grid-template-columns:1fr;}}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    MEMBER GRID
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -5019,10 +5103,14 @@ function setupTargetedListeners() {
   // ── Membres anciens ──
   watchNode('jc2_anc_members', val => {
     const arr = toArr(val).filter(n=>n&&typeof n==='string');
-    if (JSON.stringify(arr) === JSON.stringify(G.anc.members)) return; // pas de changement
+    if (JSON.stringify(arr) === JSON.stringify(G.anc.members)) return;
     G.anc.members = arr;
     localStorage.setItem('jc2_anc_members', JSON.stringify(arr));
-    scheduleRender(() => { renderGrid('anc'); updateStats(); });
+    scheduleRender(() => {
+      renderGrid('anc'); updateStats();
+      if (!cotisWeek) buildCotisWeek();
+      renderHome(); renderTracabilite(); renderNotifications();
+    }, 150);
   });
 
   // ── Membres nouveaux ──
@@ -5031,7 +5119,11 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(G.nouv.members)) return;
     G.nouv.members = arr;
     localStorage.setItem('jc2_nouv_members', JSON.stringify(arr));
-    scheduleRender(() => { renderGrid('nouv'); updateStats(); });
+    scheduleRender(() => {
+      renderGrid('nouv'); updateStats();
+      if (!cotisWeek) buildCotisWeek();
+      renderHome(); renderTracabilite(); renderNotifications();
+    }, 150);
   });
 
   // ── Drawn anciens ──
@@ -5040,7 +5132,10 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(G.anc.drawn)) return;
     G.anc.drawn = arr;
     localStorage.setItem('jc2_anc_drawn', JSON.stringify(arr));
-    scheduleRender(() => { updateTirageUI('anc'); renderChips('anc'); updateStats(); });
+    scheduleRender(() => {
+      updateTirageUI('anc'); renderChips('anc'); updateStats();
+      renderHome(); renderCalendar();
+    }, 150);
   });
 
   // ── Drawn nouveaux ──
@@ -5049,7 +5144,10 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(G.nouv.drawn)) return;
     G.nouv.drawn = arr;
     localStorage.setItem('jc2_nouv_drawn', JSON.stringify(arr));
-    scheduleRender(() => { updateTirageUI('nouv'); renderChips('nouv'); updateStats(); });
+    scheduleRender(() => {
+      updateTirageUI('nouv'); renderChips('nouv'); updateStats();
+      renderHome(); renderCalendar();
+    }, 150);
   });
 
   // ── Schedule anciens ──
@@ -5058,7 +5156,11 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(G.anc.schedule)) return;
     G.anc.schedule = arr;
     localStorage.setItem('jc2_anc_schedule', JSON.stringify(arr));
-    scheduleRender(() => { renderCalendar(); renderDashboard(); }, 200);
+    scheduleRender(() => {
+      renderCalendar(); renderDashboard();
+      if (!cotisWeek) buildCotisWeek();
+      renderHome(); renderTracabilite(); renderNotifications();
+    }, 200);
   });
 
   // ── Schedule nouveaux ──
@@ -5067,7 +5169,11 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(G.nouv.schedule)) return;
     G.nouv.schedule = arr;
     localStorage.setItem('jc2_nouv_schedule', JSON.stringify(arr));
-    scheduleRender(() => { renderCalendar(); renderDashboard(); }, 200);
+    scheduleRender(() => {
+      renderCalendar(); renderDashboard();
+      if (!cotisWeek) buildCotisWeek();
+      renderHome(); renderTracabilite(); renderNotifications();
+    }, 200);
   });
 
   // ── Base de données membres ──
@@ -5076,7 +5182,7 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(memberDB)) return;
     memberDB = arr;
     localStorage.setItem('jc2_memberdb', JSON.stringify(arr));
-    scheduleRender(() => { renderDB(); renderDashboard(); }, 300);
+    scheduleRender(() => { renderDB(); renderDashboard(); renderNotifications(); }, 300);
   });
 
   // ── Historique des réceptions ──
@@ -5091,7 +5197,11 @@ function setupTargetedListeners() {
   watchNode('jc2_cotis_week', val => {
     if (JSON.stringify(val) === JSON.stringify(cotisWeek)) return;
     cotisWeek = val;
-    scheduleRender(() => { renderTracabilite(); renderNotifications(); renderDashboard(); }, 200);
+    localStorage.setItem('jc2_cotis_week', JSON.stringify(val));
+    scheduleRender(() => {
+      renderTracabilite(); renderNotifications();
+      renderDashboard(); renderHome();
+    }, 200);
   });
 
   // ── Historique échanges ──
@@ -5131,6 +5241,18 @@ function init() {
     startDate=d.toISOString().split('T')[0]; ls('jc2_start',startDate);
   }
   document.getElementById('cfg-date').value = startDate;
+
+  // Normaliser les membres
+  if (!Array.isArray(G.anc.members))  G.anc.members  = Object.values(G.anc.members||{}).filter(n=>n&&typeof n==='string');
+  if (!Array.isArray(G.nouv.members)) G.nouv.members = Object.values(G.nouv.members||{}).filter(n=>n&&typeof n==='string');
+  G.anc.members  = G.anc.members.filter(n=>n&&typeof n==='string');
+  G.nouv.members = G.nouv.members.filter(n=>n&&typeof n==='string');
+
+  // Construire cotisWeek si pas encore fait
+  if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) {
+    buildCotisWeek();
+  }
+
   renderGrid('anc'); renderGrid('nouv');
   updateStats(); renderCalendar();
   updateTirageUI('anc'); updateTirageUI('nouv');
@@ -5140,19 +5262,19 @@ function init() {
   renderTracabilite();
   renderNotifications();
   renderDashboard();
+  renderHome(); // ← toujours en dernier pour avoir toutes les données
   startCountdown();
   loadPaymentHistory();
   initModeHorsLigne();
   updateNotifSettings();
-  initSwipeNavigation(); // ── Phase 2: Swipe navigation ──
-  // Afficher FAB et dots sur mobile
+  initSwipeNavigation();
   setTimeout(() => {
     const isMobile = window.innerWidth <= 700;
     const fab  = document.getElementById('search-fab-btn');
     const dots = document.getElementById('nav-dots');
     if (fab)  fab.style.display  = isMobile ? 'flex' : 'none';
     if (dots) dots.style.display = isMobile ? 'flex' : 'none';
-  }, 500); // ── Afficher l'état des automatisations ──
+  }, 300);
   if (localStorage.getItem('jc2_rappel_auto'))    planifierRappelJeudiMatin();
   if (localStorage.getItem('jc2_alerte_auto') === '1') planifierAlerteAuto();
   addAudit('Connexion', `Rôle: ${currentRole}`, null, null);
@@ -9991,34 +10113,41 @@ function generateResumeMsg() {
   const box = document.getElementById('wa-resume-msg');
   if (!box) return;
 
-  const allM   = cotisWeek ? cotisWeek.membersState : [];
-  if (!allM.length) { box.textContent = 'Aucun membre à afficher.'; return; }
+  // S'assurer que cotisWeek est construit
+  if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
+
+  const allM = cotisWeek ? cotisWeek.membersState : [];
+  if (!allM.length) {
+    box.textContent = 'Aucun membre — vérifiez que Firebase est connecté.';
+    return;
+  }
 
   const paid   = allM.filter(m => m.paid);
   const unpaid = allM.filter(m => !m.paid);
   const benef  = getCurrentWeekBenef();
-  const potStr = potDuBenefStr();
+  const dbBenef= benef ? memberDB.find(x=>x.nom===benef.name||x.nom?.trim()===benef.name?.trim()) : null;
+  const interac= dbBenef?.interac || dbBenef?.tel || '';
+  const potStr = benef ? potDuBenefStr(benef.name) : '';
   const today  = new Date().toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  const weekNum= cotisWeek?.weekNum || 0;
 
-  const paidList   = paid.map(m => `   ✅ ${m.name}`).join('\n');
-  const unpaidList = unpaid.map(m => `   ❌ ${m.name}`).join('\n');
-
-  const msg = `🏦 *JEUDI CASH — Mise à jour des paiements*
+  const msg =
+`🏦 *JEUDI CASH — Semaine #${String(weekNum).padStart(3,'0')}*
 📅 ${today}
+${benef ? `
+🏆 Bénéficiaire : *${benef.name}*
+💰 Montant : *${potStr}*${interac ? `\n💳 Interac : *${interac}*` : ''}
+` : ''}
+📊 *STATUT DES COTISATIONS (${paid.length}/${allM.length})*
 
-${benef ? `🏆 *Bénéficiaire : ${benef.name}*
-💰 Montant : *${potStr}*
+✅ *Payés (${paid.length}) :*
+${paid.length ? paid.map(m=>`   ✅ ${m.name}`).join('\n') : '   Aucun encore'}
 
-` : ''}📊 *STATUT DES VIREMENTS (${paid.length}/${allM.length})*
-
-✅ *Ont payé (${paid.length}) :*
-${paidList || '   Aucun encore'}
-
-❌ *N'ont pas encore payé (${unpaid.length}) :*
-${unpaidList || '   Tout le monde a payé ! 🎉'}
+❌ *En attente (${unpaid.length}) :*
+${unpaid.length ? unpaid.map(m=>`   ❌ ${m.name}`).join('\n') : '   Tout le monde a payé ! 🎉'}
 
 ${unpaid.length > 0
-  ? `⚠️ *${unpaid.length} membre${unpaid.length>1?'s':''}* — merci de faire votre virement dès que possible !`
+  ? `⚠️ Merci d'effectuer votre virement dès aujourd'hui.`
   : `🎉 *Tous les virements sont reçus !* Merci à tous 🙏`}
 
 _Jeudi Cash — Tontine officielle_ 🏦`;
@@ -10027,16 +10156,22 @@ _Jeudi Cash — Tontine officielle_ 🏦`;
 }
 
 function copyResumeMsg() {
+  generateResumeMsg(); // forcer la génération
   const msg = document.getElementById('wa-resume-msg')?.textContent || '';
-  if (!msg || msg.includes('Coche les paiements')) { toast('⚠️ Coche d\'abord les paiements pour générer le résumé', true); return; }
+  if (!msg || msg.includes('Aucun membre') || msg.includes('Firebase')) {
+    toast('⚠️ Aucun membre chargé — attends quelques secondes', true); return;
+  }
   copyText(msg);
-  toast('📋 Résumé copié ! Colle-le dans ton groupe WhatsApp');
+  toast('📋 Message copié ! Colle-le dans ton groupe WhatsApp');
 }
 
 function sendResumeWA(e) {
-  e.preventDefault();
+  if(e) e.preventDefault();
+  generateResumeMsg(); // forcer la génération
   const msg = document.getElementById('wa-resume-msg')?.textContent || '';
-  if (!msg || msg.includes('Coche les paiements')) { toast('⚠️ Coche d\'abord les paiements pour générer le résumé', true); return; }
+  if (!msg || msg.includes('Aucun membre') || msg.includes('Firebase')) {
+    toast('⚠️ Aucun membre chargé — attends quelques secondes', true); return;
+  }
   window.location.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
 }
 
@@ -10532,7 +10667,7 @@ function switchTab(name, btn) {
   if (name === 'dashboard')     { renderDashboard(); renderDashboardRevolut(); }
   if (name === 'sanctions')     renderSanctions();
   if (name === 'saison2')       renderCycles();
-  if (name === 'notifications') renderNotifications();
+  if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg, 200); }
 
   // Scroll haut
   window.scrollTo({ top: 0, behavior: 'smooth' });
