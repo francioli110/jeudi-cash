@@ -1354,78 +1354,35 @@ select{
   .cotis-row{flex-wrap:wrap;}
   .modal-overlay{align-items:flex-end;}
 }
+/* v2026-05-28 — Layout desktop fix */
 @media(min-width:701px){
   .bottom-nav{display:none !important;}
-  .container{padding-bottom:20px;}
-  .dash-grid{grid-template-columns:1fr 1fr;}
+  .nav-select-wrap{display:none !important;}
 
-  /* ── Desktop layout — centré avec max-width ── */
-  body{background:var(--bg);}
-
-  header{
-    max-width:860px;margin:0 auto;
-    padding:28px 32px 20px;
-    text-align:left;
-    border-bottom:1px solid var(--b0);
-    background:linear-gradient(180deg,rgba(240,180,41,.03) 0%,transparent 100%);
-  }
-  h1{font-size:36px;}
-
-  /* Stats bar desktop */
-  .stats{
-    max-width:860px;margin:0 auto;
-    grid-template-columns:repeat(5,1fr);
-  }
-
-  /* Config bar desktop */
-  #cfg-bar{max-width:860px;margin:0 auto;}
-
-  /* Tabs desktop */
-  .tabs{max-width:860px;margin:0 auto;padding:0 8px;}
-
-  /* Nav select caché sur desktop */
-  .nav-select-wrap{display:none;}
-
-  /* Container panels */
-  .container{
-    max-width:860px;margin:0 auto;
-    padding:24px 32px 40px;
-  }
-
-  /* Tab panels ont du padding */
-  .tab-panel{padding:24px 0;}
-
-  /* 2 colonnes sur desktop pour certains panels */
-  #trac-panel-semaine .trac-week-card{
-    max-width:100%;
-  }
-
-  /* Sync status dans header */
-  #sync-status{font-size:11px;}
+  /* Centrer TOUT dans une colonne de 900px */
+  header{ max-width:900px !important;margin:0 auto !important;padding:20px 32px 16px !important;text-align:left; }
+  h1{ font-size:32px !important; }
+  .stats{ max-width:900px !important;margin:0 auto !important;grid-template-columns:repeat(5,1fr) !important; }
+  #cfg-bar{ max-width:900px !important;margin:0 auto !important;padding-left:28px !important;padding-right:28px !important; }
+  .tabs{ max-width:900px !important;margin:0 auto !important;padding:0 20px !important; }
+  .container{ max-width:900px !important;margin:0 auto !important;padding:20px 28px 40px !important; }
+  #shortcut-bar{ max-width:900px !important;margin:0 auto !important; }
+  .tab-panel{ padding:18px 0 !important; }
+  #tab-home{ max-width:680px !important; }
+  #cotis-grid{ max-height:60vh !important; }
+  .dash-grid{ grid-template-columns:1fr 1fr !important; }
 }
 
-@media(min-width:1100px){
-  header{max-width:1100px;}
-  .stats{max-width:1100px;}
-  #cfg-bar{max-width:1100px;}
-  .tabs{max-width:1100px;}
-  .container{max-width:1100px;padding:24px 40px 40px;}
-}
-
-@media(min-width:701px){
-  /* Home desktop — limiter la largeur et centrer */
-  #tab-home{ max-width:700px; }
-
-  /* Suivi desktop — liste dans boîte plus haute */
-  #cotis-grid{ max-height:65vh !important; }
-
-  /* Dashboard 2 colonnes propres */
-  #tab-dashboard .dash-grid{
-    grid-template-columns:1fr 1fr;
+@media(min-width:1200px){
+  header,.stats,#cfg-bar,.tabs,.container,#shortcut-bar{
+    max-width:1100px !important;
   }
 }
-@media(min-width:701px) and (max-width:900px){
-  .dash-grid{grid-template-columns:1fr 1fr;}
+
+@media(max-width:380px){
+  .bottom-nav{grid-template-columns:repeat(5,1fr);}
+  .bn-label{font-size:7px;}
+  .bn-icon{font-size:18px;}
 }
 
 </style>
@@ -1846,6 +1803,7 @@ select{
 
 <!-- ══════════════════════ MAIN APP ══════════════════════ -->
 <div id="main-app" style="display:block">
+<div style="width:100%;background:var(--bg);">
 <div class="container">
 
   <header>
@@ -3453,6 +3411,7 @@ select{
 
 
 </div><!-- /container -->
+</div><!-- /wrapper -->
 </div><!-- /main-app -->
 
 <!-- ══ MODAL MEMBRE ══ -->
