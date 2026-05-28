@@ -4831,7 +4831,7 @@ function genererRecuBenef() {
   const montant    = conf ? conf.montantRecu : potDuBenef(benef.name);
   const nbCotis    = nbCotisants(benef.name);
   const fam        = getFamille(benef.name);
-  const qrUrl      = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent('https://francioli110.github.io/jeudi-cash')}&bgcolor=0a0a0a&color=F0B429&margin=6`;
+  const qrUrl      = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent('https://jeudi-cash.github.io/jeudi-cash')}&bgcolor=0a0a0a&color=F0B429&margin=6`;
   const cotisants  = cotisWeek ? cotisWeek.membersState : [];
   const payes      = cotisants.filter(m => m.paid);
   const nonPaies   = cotisants.filter(m => !m.paid);
@@ -5557,7 +5557,7 @@ function exportPDF() {
   const receiptNum = 'JC-' + today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0') + '-' + Math.floor(Math.random()*9000+1000);
 
   // ── QR Code URL ──
-  const qrData    = encodeURIComponent('https://francioli110.github.io/jeudi-cash');
+  const qrData    = encodeURIComponent('https://jeudi-cash.github.io/jeudi-cash');
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}&bgcolor=0a0a0a&color=F0B429&margin=8`;
 
   // ── Pot moyen (membre seul) pour KPI ──
