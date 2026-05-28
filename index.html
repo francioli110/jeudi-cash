@@ -3403,7 +3403,14 @@ select{
   <!-- ══ NOTIFICATIONS ══ -->
   <div class="tab-panel" id="tab-notifications">
 
-    <!-- ══ BOUTON JEUDI MATIN — 1 TAP ══ -->
+    <!-- ══ DIAGNOSTIC (s'efface automatiquement) ══ -->
+    <div id="diag-wrap" style="background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25);border-radius:12px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:1px;margin-bottom:8px">🔍 ÉTAT DU CHARGEMENT</div>
+      <div id="diag-status" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2);line-height:1.8">Vérification…</div>
+      <button onclick="forcerChargement()" style="margin-top:8px;width:100%;padding:9px;background:linear-gradient(135deg,var(--gold-light),var(--gold));border:none;border-radius:8px;color:#000;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;cursor:pointer">
+        🔄 FORCER LE CHARGEMENT
+      </button>
+    </div>
     <div id="jeudi-matin-card" style="
       background:linear-gradient(135deg,#0A1A00,#051200);
       border:2px solid rgba(16,185,129,.4);border-radius:20px;
@@ -7375,8 +7382,73 @@ const EMPTY_STATES = {
 };
 
 // ═══════════════════════════════════════
-//  1. AUTHENTIFICATION FIREBASE RÉELLE
+//  DIAGNOSTIC & FORCE CHARGEMENT
 // ═══════════════════════════════════════
+
+function updateDiagStatus() {
+  const el = document.getElementById('diag-status');
+  if (!el) return;
+  const ancN  = Array.isArray(G.anc.members)  ? G.anc.members.filter(n=>n).length  : 0;
+  const nouvN = Array.isArray(G.nouv.members) ? G.nouv.members.filter(n=>n).length : 0;
+  const cwN   = cotisWeek ? cotisWeek.membersState.length : 0;
+  const benef = getCurrentWeekBenef();
+
+  const lines = [
+    `Anciens : ${ancN} membres ${ancN===32?'✅':'❌'}`,
+    `Nouveaux : ${nouvN} membres ${nouvN===3?'✅':'❌'}`,
+    `Cotisations : ${cwN>0?cwN+' entrées ✅':'non construites ❌'}`,
+    `Bénéficiaire : ${benef?benef.name+' ✅':'non trouvé ❌'}`,
+    `Firebase : ${db?'connecté ✅':'hors ligne ❌'}`,
+  ];
+  el.innerHTML = lines.join('<br>');
+
+  // Si tout est OK — cacher le diagnostic
+  if (ancN > 0 && cwN > 0) {
+    setTimeout(() => {
+      const wrap = document.getElementById('diag-wrap');
+      if (wrap) wrap.style.display = 'none';
+    }, 3000);
+  }
+}
+
+function forcerChargement() {
+  const diag = document.getElementById('diag-status');
+  if (diag) diag.textContent = 'Chargement en cours…';
+
+  // Normaliser les membres
+  if (!Array.isArray(G.anc.members))  G.anc.members  = Object.values(G.anc.members||{}).filter(n=>n&&typeof n==='string');
+  if (!Array.isArray(G.nouv.members)) G.nouv.members = Object.values(G.nouv.members||{}).filter(n=>n&&typeof n==='string');
+
+  // Si pas de membres en mémoire → recharger depuis Firebase
+  if (!G.anc.members.length && db) {
+    if (diag) diag.textContent = 'Connexion Firebase…';
+    db.ref('jeudi_cash').once('value').then(snap => {
+      const data = snap.val() || {};
+      _applyFirebaseData(data);
+      _cacheToLocal();
+      buildCotisWeek();
+      renderHome(); renderTracabilite(); renderNotifications();
+      generateResumeMsg();
+      updateDiagStatus();
+      toast('✅ Données rechargées !');
+    }).catch(err => {
+      // Essayer localStorage
+      _loadFromLocal();
+      buildCotisWeek();
+      renderHome(); renderTracabilite(); renderNotifications();
+      generateResumeMsg();
+      updateDiagStatus();
+      toast('⚠️ Firebase indisponible — données locales utilisées', true);
+    });
+  } else {
+    // Membres déjà en mémoire — juste reconstruire
+    buildCotisWeek();
+    renderHome(); renderTracabilite(); renderNotifications();
+    generateResumeMsg();
+    updateDiagStatus();
+    toast('✅ Message généré !');
+  }
+}
 
 // Firebase Auth est optionnel — si activé, on l'utilise
 // Sinon on utilise le système de rôles existant
@@ -10681,7 +10753,10 @@ function switchTab(name, btn) {
   if (name === 'dashboard')     { renderDashboard(); renderDashboardRevolut(); }
   if (name === 'sanctions')     renderSanctions();
   if (name === 'saison2')       renderCycles();
-  if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg, 200); }
+  if (name === 'notifications') {
+    renderNotifications();
+    setTimeout(() => { generateResumeMsg(); updateDiagStatus(); }, 200);
+  }
 
   // Scroll haut
   window.scrollTo({ top: 0, behavior: 'smooth' });
