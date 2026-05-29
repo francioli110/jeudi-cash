@@ -1984,7 +1984,7 @@ select{
 
   <!-- ══ MEMBRES & BASE DE DONNÉES (UNIFIÉ) ══ -->
   <!-- ══ HOME — ÉCRAN D'ACCUEIL ══ -->
-  <div class="tab-panel active" id="tab-home">
+  <div class="tab-panel" id="tab-home">
 
     <!-- Carte bénéficiaire + countdown -->
     <div id="home-benef-card" style="background:linear-gradient(135deg,rgba(240,180,41,.12),rgba(240,180,41,.04));border:1.5px solid rgba(240,180,41,.25);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden">
@@ -2073,7 +2073,7 @@ select{
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des membres réservée aux administrateurs et au propriétaire.</div>
     </div>
-    <div id="membres-content">
+    <div id="mb-panel-fiches" style="display:none">
 
       <!-- ══ RECHERCHE AVANCÉE ══ -->
       <div id="search-box" style="background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;margin-bottom:16px;">
@@ -2234,7 +2234,7 @@ select{
         <div class="group-panels">
           <div class="group-panel ancien-panel">
             <div class="group-title" style="margin-bottom:14px">⭐ Anciens — Import liste</div>
-            <div class="import-box" id="import-anc" style="display:block">
+            <div class="import-box" id="import-anc" style="display:none">
               <div class="import-hint">Un nom par ligne</div>
               <textarea id="ta-anc" placeholder="Jean Dupont&#10;Marie Curie&#10;..." style="min-height:100px"></textarea>
               <div class="btn-row" style="margin-top:8px">
@@ -2245,7 +2245,7 @@ select{
           </div>
           <div class="group-panel nouveau-panel">
             <div class="group-title" style="margin-bottom:14px;color:var(--nouveau)">🆕 Nouveaux — Import liste</div>
-            <div class="import-box" id="import-nouv" style="display:block">
+            <div class="import-box" id="import-nouv" style="display:none">
               <div class="import-hint">Un nom par ligne</div>
               <textarea id="ta-nouv" placeholder="Alice Martin&#10;Bob Diallo&#10;..." style="min-height:100px"></textarea>
               <div class="btn-row" style="margin-top:8px">
@@ -2266,7 +2266,7 @@ select{
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Lancement du tirage réservé aux administrateurs et au propriétaire.</div>
     </div>
-    <div id="tirage-content">
+    <div id="mb-panel-tirage" style="display:none">
       <div class="tirage-grid">
         <div class="tirage-card ancien-card">
           <div class="tirage-label">⭐ Tirage — Anciens</div>
@@ -2330,7 +2330,7 @@ select{
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des échanges réservée aux administrateurs et au propriétaire.</div>
     </div>
-    <div id="echange-content">
+    <div id="mb-panel-import" style="display:none">
       <div class="swap-section">
         <div class="swap-title">🔄 Échange de position entre deux membres</div>
         <div class="swap-desc">Sélectionne deux membres qui veulent échanger leur semaine de tirage.<br>✅ = membre déjà tiré · Les échanges sont possibles pour tous les membres.</div>
@@ -3746,19 +3746,19 @@ function applyRolePermissions() {
 
   // ── Membres — édition ──
   const membresLocked  = document.getElementById('membres-locked');
-  const membresContent = document.getElementById('membres-content');
+  const membresContent = document.getElementById('mb-panel-fiches');
   if (membresLocked)  membresLocked.style.display  = p.editMembres ? 'none' : 'block';
   if (membresContent) membresContent.style.display = p.editMembres ? 'block' : 'none';
 
   // ── Tirage ──
   const tirageLocked  = document.getElementById('tirage-locked');
-  const tirageContent = document.getElementById('tirage-content');
+  const tirageContent = document.getElementById('mb-panel-tirage');
   if (tirageLocked)  tirageLocked.style.display  = p.tirage ? 'none' : 'block';
   if (tirageContent) tirageContent.style.display = p.tirage ? 'block' : 'none';
 
   // ── Échange ──
   const echangeLocked  = document.getElementById('echange-locked');
-  const echangeContent = document.getElementById('echange-content');
+  const echangeContent = document.getElementById('mb-panel-import');
   if (echangeLocked)  echangeLocked.style.display  = p.echange ? 'none' : 'block';
   if (echangeContent) echangeContent.style.display = p.echange ? 'block' : 'none';
 
@@ -9133,12 +9133,12 @@ function annulerConfirmation() {
 }
 
 function renderTracabilite() {
-  // S'assurer que le bon sous-panel est visible
-  const activeTracTab = document.querySelector('#trac-tab-semaine.active') ? 'semaine' :
-    ['scores','alertes','retards','historique','benef'].find(t =>
-      document.getElementById('trac-tab-'+t)?.classList.contains('active')
-    ) || 'semaine';
-  switchTracTab(activeTracTab);
+  // S'assurer que le sous-panel semaine est visible dans l'onglet suivi
+  if (_currentTab === 'tracabilite') {
+    const activePanel = ['semaine','scores','alertes','retards','historique','benef']
+      .find(t => document.getElementById('trac-panel-' + t)?.style.display === 'block');
+    if (!activePanel) switchTracTab('semaine');
+  }
 
   buildCotisWeek();
   updateLateCount();
@@ -9485,13 +9485,19 @@ function switchTab(name) {
   // Render du contenu
   switch(name) {
     case 'home':          renderHome();          break;
-    case 'tracabilite':   renderTracabilite();   break;
+    case 'tracabilite':
+      switchTracTab('semaine');
+      renderTracabilite();
+      break;
+    case 'membres':
+      switchMbTab('tirage');
+      renderDB();
+      break;
     case 'notifications': renderNotifications(); setTimeout(generateResumeMsg,200); break;
     case 'calendrier':    renderCalendar();      break;
     case 'dashboard':     renderDashboard();     break;
     case 'sanctions':     renderSanctions();     break;
     case 'saison2':       renderCycles();        break;
-    case 'membres':       renderDB();            break;
     case 'profil':        initProfilSelect();    break;
   }
 
