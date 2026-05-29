@@ -7463,8 +7463,68 @@ const EMPTY_STATES = {
 };
 
 // ═══════════════════════════════════════
-//  DIAGNOSTIC & FORCE CHARGEMENT
+//  FONCTIONS MANQUANTES — RESTAURÉES
 // ═══════════════════════════════════════
+
+// Confettis
+function lancerConfettis() {
+  const colors = ['#F0B429','#F5C842','#FCD34D','#00C896','#ffffff','#4F8EF7'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${Math.random()*100}vw;top:-20px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;
+      animation-delay:${Math.random()*.8}s;
+      animation-duration:${2+Math.random()*1.5}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+}
+
+// Login/logout
+function afterLogin() {
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) loginScreen.style.display = 'none';
+  const mainApp = document.getElementById('main-app');
+  if (mainApp) mainApp.style.display = 'block';
+  const cfgBar = document.getElementById('cfg-bar');
+  if (cfgBar) cfgBar.style.display = currentRole === 'owner' ? 'flex' : 'none';
+  const ownerOnly = document.querySelectorAll('.owner-only');
+  ownerOnly.forEach(el => el.style.display = currentRole === 'owner' ? '' : 'none');
+  demarrerApp();
+}
+
+function logout() {
+  currentRole = null;
+  localStorage.removeItem('jc2_role');
+  localStorage.removeItem('jc2_role_ts');
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) loginScreen.style.display = 'flex';
+  const mainApp = document.getElementById('main-app');
+  if (mainApp) mainApp.style.display = 'none';
+}
+
+// Afficher le bénéficiaire dans l'onglet Notifs
+function renderBenefNotif() {
+  const benef = getCurrentWeekBenef();
+  if (!benef) return;
+
+  const dbB    = memberDB.find(x => x.nom === benef.name || x.nom?.trim() === benef.name?.trim());
+  const interac= dbB?.interac || dbB?.tel || '';
+  const pot    = potDuBenefStr(benef.name);
+
+  // Mettre à jour la carte bénéficiaire dans Notifs si elle existe
+  const nomEl = document.getElementById('notif-benef-nom');
+  if (nomEl) nomEl.textContent = benef.name;
+  const potEl = document.getElementById('notif-benef-pot');
+  if (potEl) potEl.textContent = pot;
+  const interacEl = document.getElementById('notif-benef-interac');
+  if (interacEl) interacEl.textContent = interac || 'Non enregistré';
+}
 
 function updateDiagStatus() {
   const el = document.getElementById('diag-status');
