@@ -2903,7 +2903,7 @@ select{
     </div>
 
     <!-- ── SEMAINE EN COURS ── -->
-    <div id="trac-panel-semaine">
+    <div id="trac-panel-semaine" style="display:block">
 
       <!-- BÉNÉFICIAIRE EN VEDETTE -->
       <div id="benef-suivi-card" style="
@@ -11250,6 +11250,14 @@ applyRolePermissions();
 // ═══════════════════════════════════════
 
 function demarrerApp() {
+  // FORCER display:none sur tous les panels sauf home
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.style.display = 'none';
+    p.classList.remove('active');
+  });
+  const homePanel = document.getElementById('tab-home');
+  if (homePanel) { homePanel.style.display = 'block'; homePanel.classList.add('active'); }
+
   // 1. Charger depuis localStorage immédiatement (affichage instantané)
   _loadFromLocal();
   showLoader(false);
