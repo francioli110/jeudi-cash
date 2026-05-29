@@ -5600,30 +5600,44 @@ function updateStats(){
 //  CALENDAR
 // ═══════════════════════════════════════
 function buildRows(g, today) {
-  const sched  = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
-  const drawn  = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
-  const offset = g === 'nouv' ? (Array.isArray(G.anc.members)?G.anc.members:Object.values(G.anc.members||{})).filter(n=>n).length : 0;
+  const sched   = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
+  const drawn   = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
+  const members = (Array.isArray(G[g].members) ? G[g].members  : Object.values(G[g].members||{})).filter(n=>n);
+  const ancLen  = (Array.isArray(G.anc.members) ? G.anc.members : Object.values(G.anc.members||{})).filter(n=>n).length;
+  const offset  = g === 'nouv' ? ancLen : 0;
 
   return sched.map((s, i) => {
-    const weekNum  = offset + i + 1;
-    const iso      = s.iso || s.date || '';
-    const dateObj  = iso ? new Date(iso) : null;
-    const isPast   = dateObj ? dateObj < today : false;
-    const isCur    = (() => {
+    const weekNum = s.week || (offset + i + 1);
+
+    // Résoudre le nom : schedule → drawn[i] → members[drawn[i]]
+    let name = s.name || null;
+    if (!name && i < drawn.length) {
+      const memberIdx = Number(drawn[i]);
+      if (!isNaN(memberIdx) && memberIdx < members.length) {
+        name = members[memberIdx] || null;
+      }
+    }
+
+    const iso     = s.iso || s.date || '';
+    const dateObj = iso ? new Date(iso.substring(0,10) + 'T12:00:00') : null;
+    const isPast  = dateObj ? dateObj < today : false;
+    const isCur   = (() => {
       if (!dateObj) return false;
-      const mon = new Date(today); mon.setDate(today.getDate() - today.getDay() + 1);
-      const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
+      const mon = new Date(today);
+      mon.setDate(today.getDate() - (today.getDay()||7) + 1);
+      mon.setHours(0,0,0,0);
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23,59,59,999);
       return dateObj >= mon && dateObj <= sun;
     })();
-    const isDrawn  = drawn.includes(i) || drawn.includes(String(i));
-    const conf     = receptionsHist.find(r => r.weekNum === weekNum);
+    const conf = receptionsHist.find(r => r.weekNum === weekNum);
+
     return {
-      week:      s.week || weekNum,
-      name:      s.name || null,
+      week:      weekNum,
+      name:      name,
       date:      s.date || '—',
       iso,
       idx:       i,
-      drawn:     isDrawn || !!s.name,
+      drawn:     i < drawn.length,
       past:      isPast,
       cur:       isCur,
       confirmed: !!conf,
