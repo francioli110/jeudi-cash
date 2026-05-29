@@ -2903,7 +2903,7 @@ select{
     </div>
 
     <!-- ── SEMAINE EN COURS ── -->
-    <div id="trac-panel-semaine" style="display:block">
+    <div id="trac-panel-semaine" style="display:none">
 
       <!-- BÉNÉFICIAIRE EN VEDETTE -->
       <div id="benef-suivi-card" style="
@@ -9113,6 +9113,13 @@ function annulerConfirmation() {
 }
 
 function renderTracabilite() {
+  // S'assurer que le bon sous-panel est visible
+  const activeTracTab = document.querySelector('#trac-tab-semaine.active') ? 'semaine' :
+    ['scores','alertes','retards','historique','benef'].find(t =>
+      document.getElementById('trac-tab-'+t)?.classList.contains('active')
+    ) || 'semaine';
+  switchTracTab(activeTracTab);
+
   buildCotisWeek();
   updateLateCount();
   renderBenefSuivi();
@@ -11254,6 +11261,11 @@ function demarrerApp() {
   document.querySelectorAll('.tab-panel').forEach(p => {
     p.style.display = 'none';
     p.classList.remove('active');
+  });
+  // Cacher aussi tous les sous-panels de tracabilite
+  ['semaine','scores','alertes','retards','historique','benef'].forEach(t => {
+    const el = document.getElementById('trac-panel-' + t);
+    if (el) el.style.display = 'none';
   });
   const homePanel = document.getElementById('tab-home');
   if (homePanel) { homePanel.style.display = 'block'; homePanel.classList.add('active'); }
