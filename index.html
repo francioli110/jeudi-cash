@@ -1746,7 +1746,7 @@ select{
       <button class="more-btn-sm" onclick="switchTabFromMore('membres')">
         <span>👥</span><span>Membres</span>
       </button>
-      <button class="more-btn-sm" onclick="switchTabFromMore('tirage')">
+      <button class="more-btn-sm" onclick="switchTabFromMore('membres');setTimeout(()=>switchMbTab('tirage'),100)">
         <span>🎰</span><span>Tirage</span>
       </button>
       <button class="more-btn-sm" onclick="switchTabFromMore('echange')">
@@ -1957,7 +1957,7 @@ select{
   <div class="tabs" id="main-tabs">
     <button class="tab active" id="tab-home-btn" onclick="switchTab('home',this)">🏠 Accueil</button>
     <button class="tab" onclick="switchTab('membres',this)">👥 Membres</button>
-    <button class="tab" onclick="switchTab('tirage',this)">🎰 Tirage</button>
+    <button class="tab" onclick="switchTab('membres',this);setTimeout(()=>switchMbTab('tirage'),100)">🎰 Tirage</button>
     <button class="tab" onclick="switchTab('calendrier',this)">📅 Calendrier</button>
     <button class="tab" onclick="switchTab('echange',this)">🔄 Échange</button>
     <button class="tab" id="tab-trac-btn" onclick="switchTab('tracabilite',this)">✅ Suivi</button>
@@ -4298,7 +4298,7 @@ function restaurerDepuisBackup(index) {
   updateStats(); renderCalendar();
   updateTirageUI('anc'); updateTirageUI('nouv');
   renderChips('anc'); renderChips('nouv');
-  renderSwapLog(); renderDB(); renderTracabilite(); renderNotifications(); renderDashboard();
+  renderSwapLog(); renderTracabilite(); renderNotifications(); renderDashboard();
   renderHome();
   initOnboarding();
   initProfilSelect();
@@ -5229,7 +5229,7 @@ function setupTargetedListeners() {
     if (JSON.stringify(arr) === JSON.stringify(memberDB)) return;
     memberDB = arr;
     localStorage.setItem('jc2_memberdb', JSON.stringify(arr));
-    scheduleRender(() => { renderDB(); renderDashboard(); renderNotifications(); }, 300);
+    scheduleRender(() => { if(_currentTab==='membres')renderDB(); renderDashboard(); renderNotifications(); }, 300);
   });
 
   // ── Historique des réceptions ──
@@ -5308,7 +5308,6 @@ function init() {
   updateTirageUI('anc'); updateTirageUI('nouv');
   renderChips('anc'); renderChips('nouv');
   renderSwapLog();
-  renderDB();
   renderHome(); // ← accueil par défaut
   startCountdown();
   loadPaymentHistory();
@@ -5358,7 +5357,7 @@ function resetAll() {
   currentConfirm=null; ls('jc2_cur_confirm',null);
   renderGrid('anc'); renderGrid('nouv'); updateStats(); renderCalendar();
   updateTirageUI('anc'); updateTirageUI('nouv'); renderChips('anc'); renderChips('nouv');
-  renderSwapLog(); renderDB(); renderTracabilite(); renderNotifications(); renderDashboard();
+  renderSwapLog(); renderTracabilite(); renderNotifications(); renderDashboard();
   toast('🔄 Tout réinitialisé !');
 }
 
@@ -9430,7 +9429,7 @@ function switchTab(name) {
   try {
     if (name === 'home')          renderHome();
     if (name === 'tracabilite')   { switchTracTab('semaine'); renderTracabilite(); }
-    if (name === 'membres')       { switchMbTab('tirage'); }
+    if (name === 'membres')       { switchMbTab('tirage'); renderDB(); }
     if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg,200); }
     if (name === 'calendrier')    renderCalendar();
     if (name === 'dashboard')     renderDashboard();
@@ -9442,14 +9441,6 @@ function switchTab(name) {
 function switchTabMobile(name, btn) { switchTab(name); }
 function switchTabFromMore(name)    { switchTab(name); }
 
-
-function switchTabMobile(name, btn) { switchTab(name); }
-function switchTabFromMore(name)    { switchTab(name); }
-
-
-// Aliases
-function switchTabMobile(name, btn) { switchTab(name); }
-function switchTabFromMore(name)    { switchTab(name); }
 
 // Fermer le menu Plus si on appuie sur Échap
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMoreMenu(); });
@@ -11299,7 +11290,6 @@ function renderAll() {
   updateTirageUI('anc'); updateTirageUI('nouv');
   renderChips('anc'); renderChips('nouv');
   renderSwapLog();
-  renderDB();
   renderBackupList();
   initProfilSelect();
   generateResumeMsg();
