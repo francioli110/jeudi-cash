@@ -5304,15 +5304,12 @@ function init() {
   }
 
   renderGrid('anc'); renderGrid('nouv');
-  updateStats(); renderCalendar();
+  updateStats();
   updateTirageUI('anc'); updateTirageUI('nouv');
   renderChips('anc'); renderChips('nouv');
   renderSwapLog();
   renderDB();
-  renderTracabilite();
-  renderNotifications();
-  renderDashboard();
-  renderHome(); // ← toujours en dernier pour avoir toutes les données
+  renderHome(); // ← accueil par défaut
   startCountdown();
   loadPaymentHistory();
   initModeHorsLigne();
@@ -11359,25 +11356,32 @@ function renderAll() {
   G.anc.members  = G.anc.members.filter(n=>n&&typeof n==='string');
   G.nouv.members = G.nouv.members.filter(n=>n&&typeof n==='string');
 
-  // Appliquer données intégrées si Firebase n'a pas chargé
   appliquerDonneesDefaut();
-
   if (!cotisWeek && (G.anc.members.length || G.nouv.members.length)) buildCotisWeek();
 
+  // Rendre les données de base (sans toucher à l'affichage)
   updateStats();
-  renderHome();
-  renderTracabilite();
-  renderNotifications();
-  generateResumeMsg();
-  renderCalendar();
-  renderDB();
   renderGrid('anc'); renderGrid('nouv');
   updateTirageUI('anc'); updateTirageUI('nouv');
   renderChips('anc'); renderChips('nouv');
   renderSwapLog();
-  renderDashboard();
+  renderDB();
   renderBackupList();
   initProfilSelect();
+  generateResumeMsg();
+
+  // Rendre uniquement l'onglet actif
+  switch(_currentTab) {
+    case 'home':          renderHome();          break;
+    case 'tracabilite':   renderTracabilite();   break;
+    case 'notifications': renderNotifications(); break;
+    case 'calendrier':    renderCalendar();      break;
+    case 'dashboard':     renderDashboard();     break;
+    case 'sanctions':     renderSanctions();     break;
+    case 'saison2':       renderCycles();        break;
+    default:              renderHome();          break;
+  }
+
   setTimeout(updateDiagStatus, 500);
 }
 
