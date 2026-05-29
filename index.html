@@ -8296,8 +8296,12 @@ function renderHome() {
     upd('home-benef-sem', `Sem. #${String(benef.week).padStart(3,'0')} · ${benef.date}`);
     upd('home-benef-pot', potDuBenefStr(benef.name));
   } else {
-    upd('home-benef-nom', 'Aucun bénéficiaire');
-    upd('home-benef-sem', 'Tirage non effectué');
+    // Debug : afficher ce qu'on a
+    const ancSched = Array.isArray(G.anc.schedule) ? G.anc.schedule : Object.values(G.anc.schedule||{});
+    const nouvSched= Array.isArray(G.nouv.schedule)? G.nouv.schedule: Object.values(G.nouv.schedule||{});
+    const debugMsg = `Aucun bénéf — sched: ${ancSched.length}A/${nouvSched.length}N, cw:#${cotisWeek?.weekNum||'?'}`;
+    upd('home-benef-nom', debugMsg);
+    upd('home-benef-sem', `start: ${startDate||'non défini'}`);
     upd('home-benef-pot', '—');
   }
 
@@ -8892,65 +8896,54 @@ function getCurrentWeekBounds() {
 
 // ── Bénéficiaire de la semaine courante (lundi→dimanche) ──
 function getCurrentWeekBenef() {
+  const today    = new Date();
   const { monday, sunday, thursday } = getCurrentWeekBounds();
 
-  // ── Méthode 1 : via le schedule Firebase ──
+  // ── Méthode 1 : chercher dans le schedule par date ──
   let found = null;
   ['anc','nouv'].forEach(g => {
-    const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
+    const schedule = Array.isArray(G[g].schedule)
+      ? G[g].schedule
+      : Object.values(G[g].schedule||{});
     schedule.forEach(s => {
-      if (!s.name) return;
+      if (!s || !s.name) return;
+      // Comparer par date ISO ou par numéro de semaine
       const iso = s.iso || s.date || '';
-      if (!iso) return;
-      const d = new Date(iso);
-      if (d >= monday && d <= sunday) {
-        found = { name: s.name, groupe: g, week: s.week, date: s.date||iso, montantDu: potDuBenef(s.name) };
+      if (iso) {
+        const d = new Date(iso);
+        if (!isNaN(d) && d >= monday && d <= sunday) {
+          found = { name: s.name, groupe: g, week: s.week||0, date: s.date||iso, montantDu: potDuBenef(s.name) };
+        }
       }
     });
   });
   if (found) return found;
 
-  // ── Méthode 2 : via cotisWeek ──
+  // ── Méthode 2 : via numéro de semaine de cotisWeek ──
   if (cotisWeek && cotisWeek.weekNum) {
-    const weekNum = cotisWeek.weekNum;
-    // Chercher dans le schedule par numéro de semaine
+    const wn = cotisWeek.weekNum;
     ['anc','nouv'].forEach(g => {
-      const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
-      const s = schedule.find(x => x.week === weekNum || x.week === String(weekNum));
-      if (s && s.name) {
-        found = { name: s.name, groupe: g, week: s.week, date: s.date||'', montantDu: potDuBenef(s.name) };
+      const schedule = Array.isArray(G[g].schedule)
+        ? G[g].schedule
+        : Object.values(G[g].schedule||{});
+      const s = schedule.find(x => x && (x.week === wn || x.week === String(wn)));
+      if (s && s.name && !found) {
+        found = { name: s.name, groupe: g, week: s.week||wn, date: s.date||'', montantDu: potDuBenef(s.name) };
       }
     });
   }
   if (found) return found;
 
-  // ── Méthode 3 : calcul depuis la date de départ ──
-  if (startDate) {
-    const start = new Date(startDate);
-    const diffMs = thursday - start;
-    const diffSem = Math.round(diffMs / (7 * 24 * 3600 * 1000));
-    if (diffSem >= 0) {
-      const weekNum = diffSem + 1;
-      const allMembers = [
-        ...MEMBRES_ANCIENS_DEFAULT.map(n => ({n, g:'anc'})),
-        ...MEMBRES_NOUVEAUX_DEFAULT.map(n => ({n, g:'nouv'}))
-      ];
-      if (weekNum >= 1 && weekNum <= allMembers.length) {
-        const m = allMembers[weekNum - 1];
-        const thuStr = thursday.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
-        return { name: m.n, groupe: m.g, week: weekNum, date: thuStr, montantDu: potDuBenef(m.n) };
-      }
-    }
-  }
-
-  // ── Méthode 4 : dernier tiré ──
+  // ── Méthode 3 : dernier dans le schedule ──
   ['anc','nouv'].forEach(g => {
-    const drawn    = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
-    const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
-    if (!drawn.length || !schedule.length) return;
-    const last = schedule[schedule.length - 1];
-    if (last && last.name) {
-      found = { name: last.name, groupe: g, week: last.week, date: last.date||'', montantDu: potDuBenef(last.name) };
+    if (found) return;
+    const schedule = Array.isArray(G[g].schedule)
+      ? G[g].schedule
+      : Object.values(G[g].schedule||{});
+    const valids = schedule.filter(s => s && s.name);
+    if (valids.length) {
+      const last = valids[valids.length - 1];
+      found = { name: last.name, groupe: g, week: last.week||0, date: last.date||'', montantDu: potDuBenef(last.name) };
     }
   });
   return found;
