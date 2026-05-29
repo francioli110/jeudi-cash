@@ -406,7 +406,7 @@ h1{
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .tab-panel{display:none;padding:16px;animation:panel-in .2s ease-out;}
 .tab-panel.active{display:block;}
-@keyframes panel-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    SECTIONS & CARDS
@@ -9301,10 +9301,72 @@ function closeMoreMenu() {
   }, 250);
 }
 // ═══════════════════════════════════════
-//  NAVIGATION — FONCTION UNIFIÉE
+//  NAVIGATION — VERSION SIMPLE ET ROBUSTE
 // ═══════════════════════════════════════
 
 let _currentTab = 'home';
+
+function switchTab(name) {
+  _currentTab = name;
+
+  // Cacher TOUS les panels
+  var panels = document.querySelectorAll('.tab-panel');
+  for (var i = 0; i < panels.length; i++) {
+    panels[i].style.display = 'none';
+    panels[i].classList.remove('active');
+  }
+
+  // Afficher LE panel demandé
+  var target = document.getElementById('tab-' + name);
+  if (target) {
+    target.style.display = 'block';
+    target.classList.add('active');
+  }
+
+  // Update desktop tabs
+  var dtabs = document.querySelectorAll('.tabs .tab');
+  for (var j = 0; j < dtabs.length; j++) {
+    var oc = dtabs[j].getAttribute('onclick') || '';
+    if (oc.indexOf("'" + name + "'") !== -1 || oc.indexOf('"' + name + '"') !== -1) {
+      dtabs[j].classList.add('active');
+    } else {
+      dtabs[j].classList.remove('active');
+    }
+  }
+
+  // Update bottom nav
+  var bnItems = document.querySelectorAll('.bn-item');
+  for (var k = 0; k < bnItems.length; k++) {
+    var oc2 = bnItems[k].getAttribute('onclick') || '';
+    if (oc2.indexOf("'" + name + "'") !== -1 || oc2.indexOf('"' + name + '"') !== -1) {
+      bnItems[k].classList.add('active');
+    } else {
+      bnItems[k].classList.remove('active');
+    }
+  }
+
+  // Scroll haut
+  window.scrollTo(0, 0);
+
+  // Fermer menu Plus
+  try { closeMoreMenu(); } catch(e) {}
+
+  // Render contenu
+  try {
+    if (name === 'home')          renderHome();
+    if (name === 'tracabilite')   { renderTracabilite(); setTimeout(generateResumeMsg, 300); }
+    if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg, 300); }
+    if (name === 'calendrier')    renderCalendar();
+    if (name === 'dashboard')     renderDashboard();
+    if (name === 'sanctions')     renderSanctions();
+    if (name === 'saison2')       renderCycles();
+    if (name === 'membres')       renderDB();
+    if (name === 'profil')        initProfilSelect();
+  } catch(e) { console.warn('Render error:', e); }
+}
+
+function switchTabMobile(name, btn) { switchTab(name); }
+function switchTabFromMore(name)    { switchTab(name); }
 
 function switchTab(name) {
   if (_currentTab === name) return;
