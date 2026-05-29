@@ -38,41 +38,31 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <script>
-// ── Injecter le manifest dynamiquement ──
+// ── Manifest PWA ──
 (function() {
+  const base = 'https://jeudi-cash.github.io/jeudi-cash/';
   const manifest = {
     name: "Jeudi Cash — Tontine",
     short_name: "Jeudi Cash",
     description: "Application de gestion de tontine hebdomadaire",
-    start_url: "/jeudi-cash/",
-    scope: "/jeudi-cash/",
+    start_url: base,
+    scope: base,
     display: "standalone",
     orientation: "portrait",
-    background_color: "#0A0A0A",
+    background_color: "#070709",
     theme_color: "#F0B429",
-    categories: ["finance", "utilities"],
     icons: [
       {
-        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%230A0A0A'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23F0B429' stroke-width='16'/%3E%3Ctext x='256' y='210' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3EJEUDI%3C/text%3E%3Ctext x='256' y='300' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3ECASH%3C/text%3E%3C/svg%3E",
-        sizes: "192x192",
-        type: "image/svg+xml",
-        purpose: "any maskable"
-      },
-      {
-        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%230A0A0A'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23F0B429' stroke-width='16'/%3E%3Ctext x='256' y='210' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3EJEUDI%3C/text%3E%3Ctext x='256' y='300' text-anchor='middle' font-family='Arial Black' font-size='72' font-weight='900' fill='%23F0B429'%3ECASH%3C/text%3E%3C/svg%3E",
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%23070709'/%3E%3Ctext x='256' y='300' text-anchor='middle' font-family='Arial Black' font-size='160' font-weight='900' fill='%23F0B429'%3EJC%3C/text%3E%3C/svg%3E",
         sizes: "512x512",
-        type: "image/svg+xml",
-        purpose: "any maskable"
+        type: "image/svg+xml"
       }
-    ],
-    shortcuts: [
-      { name: "Suivi", url: "/jeudi-cash/#suivi", description: "Voir les cotisations" },
-      { name: "Notifs", url: "/jeudi-cash/#notifs", description: "Envoyer les notifications" }
     ]
   };
-  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-  const url  = URL.createObjectURL(blob);
-  document.getElementById('pwa-manifest').href = url;
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+    document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
+  } catch(e) {}
 })();
 </script>
 <style>
@@ -11279,36 +11269,44 @@ function demarrerApp() {
   if (typeof firebase !== 'undefined' && db) {
     setSyncStatus('loading');
 
-    // Timeout 10s
-    const tOut = setTimeout(() => {
-      console.warn('Firebase timeout');
-      setSyncStatus('error');
-      // Réessayer une fois
-      setTimeout(() => {
-        db.ref('jeudi_cash').once('value')
-          .then(s => { if(s.val()) { _applyFirebaseData(s.val()); _cacheToLocal(); buildCotisWeek(); renderAll(); setSyncStatus('saved'); }})
-          .catch(()=>{});
-      }, 5000);
-    }, 10000);
-
-    db.ref('jeudi_cash').once('value')
-      .then(snap => {
-        clearTimeout(tOut);
-        const data = snap.val();
-        if (data) {
-          _applyFirebaseData(data);
-          _cacheToLocal();
+    function essayerFirebase(tentative) {
+      const delai = tentative === 1 ? 20000 : 30000; // 20s puis 30s
+      const tOut = setTimeout(() => {
+        console.warn('Firebase timeout tentative', tentative);
+        if (tentative < 3) {
+          setSyncStatus('loading');
+          essayerFirebase(tentative + 1);
+        } else {
+          setSyncStatus('error');
+          toast('⚠️ Firebase lent — données locales utilisées', true);
         }
-        buildCotisWeek();
-        renderAll();
-        setSyncStatus('saved');
-        setupTargetedListeners();
-      })
-      .catch(err => {
-        clearTimeout(tOut);
-        console.warn('Firebase err:', err);
-        setSyncStatus('error');
-      });
+      }, delai);
+
+      db.ref('jeudi_cash').once('value')
+        .then(snap => {
+          clearTimeout(tOut);
+          const data = snap.val();
+          if (data) {
+            _applyFirebaseData(data);
+            _cacheToLocal();
+          }
+          buildCotisWeek();
+          renderAll();
+          setSyncStatus('saved');
+          setupTargetedListeners();
+        })
+        .catch(err => {
+          clearTimeout(tOut);
+          console.warn('Firebase err tentative', tentative, err);
+          if (tentative < 3) {
+            setTimeout(() => essayerFirebase(tentative + 1), 3000);
+          } else {
+            setSyncStatus('error');
+          }
+        });
+    }
+
+    essayerFirebase(1);
   } else {
     setSyncStatus('offline');
     buildCotisWeek();
