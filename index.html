@@ -8892,34 +8892,67 @@ function getCurrentWeekBounds() {
 
 // ── Bénéficiaire de la semaine courante (lundi→dimanche) ──
 function getCurrentWeekBenef() {
-  const { monday, sunday } = getCurrentWeekBounds();
+  const { monday, sunday, thursday } = getCurrentWeekBounds();
 
-  // Chercher un membre dont le jeudi tombe dans cette semaine lun-dim
+  // ── Méthode 1 : via le schedule Firebase ──
   let found = null;
   ['anc','nouv'].forEach(g => {
     const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
-    const drawn    = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
     schedule.forEach(s => {
-      if (!s.name || !s.iso) return;
-      const d = new Date(s.iso);
-      // Le jeudi est dans la fenêtre lundi→dimanche de cette semaine
-      if (d >= monday && d <= sunday && drawn.includes(s.idx)) {
-        found = { name: s.name, groupe: g, week: s.week, date: s.date, montantDu: potDuBenef(s.name) };
+      if (!s.name) return;
+      const iso = s.iso || s.date || '';
+      if (!iso) return;
+      const d = new Date(iso);
+      if (d >= monday && d <= sunday) {
+        found = { name: s.name, groupe: g, week: s.week, date: s.date||iso, montantDu: potDuBenef(s.name) };
       }
     });
   });
+  if (found) return found;
 
-  // Fallback : dernier membre tiré
-  if (!found) {
+  // ── Méthode 2 : via cotisWeek ──
+  if (cotisWeek && cotisWeek.weekNum) {
+    const weekNum = cotisWeek.weekNum;
+    // Chercher dans le schedule par numéro de semaine
     ['anc','nouv'].forEach(g => {
-      const drawn    = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
       const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
-      if (!drawn.length) return;
-      const lastIdx = drawn[drawn.length - 1];
-      const sched   = schedule.find(s => s.idx === lastIdx);
-      if (sched) found = { name: sched.name, groupe: g, week: sched.week, date: sched.date, montantDu: potDuBenef(sched.name) };
+      const s = schedule.find(x => x.week === weekNum || x.week === String(weekNum));
+      if (s && s.name) {
+        found = { name: s.name, groupe: g, week: s.week, date: s.date||'', montantDu: potDuBenef(s.name) };
+      }
     });
   }
+  if (found) return found;
+
+  // ── Méthode 3 : calcul depuis la date de départ ──
+  if (startDate) {
+    const start = new Date(startDate);
+    const diffMs = thursday - start;
+    const diffSem = Math.round(diffMs / (7 * 24 * 3600 * 1000));
+    if (diffSem >= 0) {
+      const weekNum = diffSem + 1;
+      const allMembers = [
+        ...MEMBRES_ANCIENS_DEFAULT.map(n => ({n, g:'anc'})),
+        ...MEMBRES_NOUVEAUX_DEFAULT.map(n => ({n, g:'nouv'}))
+      ];
+      if (weekNum >= 1 && weekNum <= allMembers.length) {
+        const m = allMembers[weekNum - 1];
+        const thuStr = thursday.toLocaleDateString('fr-CA', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+        return { name: m.n, groupe: m.g, week: weekNum, date: thuStr, montantDu: potDuBenef(m.n) };
+      }
+    }
+  }
+
+  // ── Méthode 4 : dernier tiré ──
+  ['anc','nouv'].forEach(g => {
+    const drawn    = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
+    const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
+    if (!drawn.length || !schedule.length) return;
+    const last = schedule[schedule.length - 1];
+    if (last && last.name) {
+      found = { name: last.name, groupe: g, week: last.week, date: last.date||'', montantDu: potDuBenef(last.name) };
+    }
+  });
   return found;
 }
 
