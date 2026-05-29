@@ -2180,7 +2180,7 @@ select{
       </div>
 
       <!-- ── TIRAGE PANEL ── -->
-      <div id="mb-panel-tirage">
+      <div id="mb-panel-tirage" style="display:none">
         <div class="group-panels">
           <div class="group-panel ancien-panel">
             <div class="group-header">
@@ -5632,6 +5632,8 @@ function buildRows(g, today) {
 }
 
 function renderCalendar(){
+  const calContent = document.getElementById('cal-content');
+  if (calContent) calContent.style.display = 'block';
   const box   = document.getElementById('cal-content');
   const q     = (document.getElementById('cal-search')?.value||'').toLowerCase();
   const today = new Date();
@@ -9828,12 +9830,12 @@ function onGlobalSearch() {
 
 function switchMbTab(name, btn) {
   ['tirage','fiches','import'].forEach(t => {
-    const panel = document.getElementById(`mb-panel-${t}`);
-    if(panel) panel.style.display = t===name ? 'block' : 'none';
-    const tb = document.getElementById(`mb-tab-${t}`);
-    if(tb) tb.classList.toggle('active', t===name);
+    const panel = document.getElementById('mb-panel-' + t);
+    if (panel) panel.style.display = t === name ? 'block' : 'none';
+    const tb = document.getElementById('mb-tab-' + t);
+    if (tb) tb.classList.toggle('active', t === name);
   });
-  if(name==='fiches') renderDB();
+  if (name === 'fiches') renderDB();
 }
 
 function renderDashboard() {
