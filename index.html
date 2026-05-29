@@ -1746,7 +1746,7 @@ select{
       <button class="more-btn-sm" onclick="switchTabFromMore('membres')">
         <span>👥</span><span>Membres</span>
       </button>
-      <button class="more-btn-sm" onclick="switchTabFromMore('membres');setTimeout(()=>switchMbTab('tirage'),100)">
+      <button class="more-btn-sm" onclick="switchTabFromMore('tirage')">
         <span>🎰</span><span>Tirage</span>
       </button>
       <button class="more-btn-sm" onclick="switchTabFromMore('echange')">
@@ -1957,7 +1957,7 @@ select{
   <div class="tabs" id="main-tabs">
     <button class="tab active" id="tab-home-btn" onclick="switchTab('home',this)">🏠 Accueil</button>
     <button class="tab" onclick="switchTab('membres',this)">👥 Membres</button>
-    <button class="tab" onclick="switchTab('membres',this);setTimeout(()=>switchMbTab('tirage'),100)">🎰 Tirage</button>
+    <button class="tab" onclick="switchTab('tirage',this)">🎰 Tirage</button>
     <button class="tab" onclick="switchTab('calendrier',this)">📅 Calendrier</button>
     <button class="tab" onclick="switchTab('echange',this)">🔄 Échange</button>
     <button class="tab" id="tab-trac-btn" onclick="switchTab('tracabilite',this)">✅ Suivi</button>
@@ -9412,32 +9412,61 @@ let _currentTab = 'home';
 
 function switchTab(name) {
   _currentTab = name;
+
+  // Cacher TOUS les onglets
   ALL_TABS.forEach(function(t) {
     var el = document.getElementById('tab-' + t);
     if (el) el.style.display = 'none';
   });
+
+  // Afficher seulement celui demandé
   var target = document.getElementById('tab-' + name);
-  if (target) target.style.display = 'block';
+  if (target) {
+    target.style.display = 'block';
+  } else {
+    console.warn('Tab not found: tab-' + name);
+  }
+
+  // Nav desktop
   document.querySelectorAll('.tabs .tab').forEach(function(t) {
-    t.classList.toggle('active', (t.getAttribute('onclick')||'').indexOf("'" + name + "'") !== -1);
+    var oc = t.getAttribute('onclick') || '';
+    t.classList.toggle('active', oc.indexOf("'" + name + "'") !== -1);
   });
+
+  // Nav mobile
   document.querySelectorAll('.bn-item').forEach(function(b) {
-    b.classList.toggle('active', (b.getAttribute('onclick')||'').indexOf("'" + name + "'") !== -1);
+    var oc = b.getAttribute('onclick') || '';
+    b.classList.toggle('active', oc.indexOf("'" + name + "'") !== -1);
   });
+
   window.scrollTo(0, 0);
   try { closeMoreMenu(); } catch(e) {}
+
+  // Render contenu selon l'onglet
   try {
     if (name === 'home')          renderHome();
     if (name === 'tracabilite')   { switchTracTab('semaine'); renderTracabilite(); }
-    if (name === 'membres')       { switchMbTab('tirage'); renderDB(); }
-    if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg,200); }
+    if (name === 'membres') {
+      // Montrer directement mb-panel-fiches
+      ['tirage','fiches','import'].forEach(function(t) {
+        var p = document.getElementById('mb-panel-' + t);
+        if (p) p.style.display = t === 'fiches' ? 'block' : 'none';
+      });
+      renderDB();
+    }
+    if (name === 'tirage')        { updateTirageUI('anc'); updateTirageUI('nouv'); renderGrid('anc'); renderGrid('nouv'); renderChips('anc'); renderChips('nouv'); }
+    if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg, 200); }
     if (name === 'calendrier')    renderCalendar();
-    if (name === 'dashboard')     renderDashboard();
+    if (name === 'dashboard')     { try { renderDashboard(); } catch(e) { console.warn('dashboard err:', e); } }
+    if (name === 'echange')       { renderSwapLog(); }
     if (name === 'sanctions')     renderSanctions();
     if (name === 'saison2')       renderCycles();
     if (name === 'profil')        initProfilSelect();
-  } catch(e) { console.warn('Render error:', e); }
+  } catch(e) {
+    console.warn('Render error for ' + name + ':', e);
+  }
 }
+
 function switchTabMobile(name, btn) { switchTab(name); }
 function switchTabFromMore(name)    { switchTab(name); }
 
@@ -9752,40 +9781,55 @@ function switchMbTab(name, btn) {
     const tb = document.getElementById('mb-tab-' + t);
     if (tb) tb.classList.toggle('active', t === name);
   });
-  if (name === 'fiches') renderDB();
+  if (name === 'fiches') {
+    setTimeout(function() { renderDB(); }, 50);
+  }
 }
 
 function renderDashboard() {
   const today    = new Date();
-  const ancTotal = (Array.isArray(G.anc.members)?G.anc.members:Object.values(G.anc.members||{})).filter(n=>n).length;
-  const nouvTotal= (Array.isArray(G.nouv.members)?G.nouv.members:Object.values(G.nouv.members||{})).filter(n=>n).length;
+  const ancMem   = (Array.isArray(G.anc.members)?G.anc.members:Object.values(G.anc.members||{})).filter(n=>n);
+  const nouvMem  = (Array.isArray(G.nouv.members)?G.nouv.members:Object.values(G.nouv.members||{})).filter(n=>n);
+  const ancTotal = ancMem.length;
+  const nouvTotal= nouvMem.length;
   const total    = ancTotal + nouvTotal;
   const ancDone  = (Array.isArray(G.anc.drawn)?G.anc.drawn:Object.values(G.anc.drawn||{})).length;
   const nouvDone = (Array.isArray(G.nouv.drawn)?G.nouv.drawn:Object.values(G.nouv.drawn||{})).length;
   const done     = ancDone + nouvDone;
   const remaining= total - done;
   const pct      = total > 0 ? Math.round((done/total)*100) : 0;
-  // Pot moyen affiché (sans bénéficiaire, membre seul)
   const potSem   = total > 1 ? (total - 1) * COTISATION : total * COTISATION;
 
-  // ── CALCULS FINANCIERS RÉELS ──
+  // ── CALCULS FINANCIERS ──
+  const ancSched  = Array.isArray(G.anc.schedule)  ? G.anc.schedule  : Object.values(G.anc.schedule||{});
+  const nouvSched = Array.isArray(G.nouv.schedule) ? G.nouv.schedule : Object.values(G.nouv.schedule||{});
+  const ancDrawn  = Array.isArray(G.anc.drawn)     ? G.anc.drawn     : Object.values(G.anc.drawn||{});
+  const nouvDrawn = Array.isArray(G.nouv.drawn)    ? G.nouv.drawn    : Object.values(G.nouv.drawn||{});
+
+  // Reconstituer le schedule avec les vrais noms
   const allSched = [
-    ...(Array.isArray(G.anc.schedule)?G.anc.schedule:Object.values(G.anc.schedule||{})),
-    ...(Array.isArray(G.nouv.schedule)?G.nouv.schedule:Object.values(G.nouv.schedule||{}))
-  ].filter(s=>s.name);
+    ...ancSched.map((s,i) => ({
+      ...s,
+      name: s.name || (i < ancDrawn.length ? ancMem[Number(ancDrawn[i])] : null),
+      week: s.week || (i+1)
+    })),
+    ...nouvSched.map((s,i) => ({
+      ...s,
+      name: s.name || (i < nouvDrawn.length ? nouvMem[Number(nouvDrawn[i])] : null),
+      week: s.week || (ancTotal+i+1)
+    }))
+  ].filter(s => s.name);
 
   const todayMid = new Date(today); todayMid.setHours(0,0,0,0);
 
   const semPassees = allSched.filter(s => {
-    const d = s.iso ? new Date(s.iso) : null;
-    const dm = d ? new Date(d) : null; if(dm) dm.setHours(0,0,0,0);
-    return dm && dm <= todayMid;
+    const d = s.iso ? new Date(s.iso.substring(0,10)+'T12:00:00') : null;
+    return d && d <= todayMid;
   });
 
   const semFutures = allSched.filter(s => {
-    const d = s.iso ? new Date(s.iso) : null;
-    const dm = d ? new Date(d) : null; if(dm) dm.setHours(0,0,0,0);
-    return dm && dm > todayMid;
+    const d = s.iso ? new Date(s.iso.substring(0,10)+'T12:00:00') : null;
+    return d && d > todayMid;
   });
 
   // ── Total réellement distribué = somme des pots confirmés ──
