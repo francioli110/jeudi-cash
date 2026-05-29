@@ -386,8 +386,9 @@ h1{
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TAB PANELS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.tab-panel{display:none;padding:16px;animation:panel-in .2s ease-out;}
-.tab-panel.active{display:block;}
+/* ── ONGLETS ── */
+.tab-panel { display: none; padding: 16px; }
+.tab-panel.active { display: block; }
 @keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2067,7 +2068,7 @@ select{
 
   </div><!-- /tab-home -->
 
-  <div class="tab-panel" id="tab-membres">
+  <div class="tab-panel" id="tab-membres" style="display:none">
     <div id="membres-locked" class="locked-overlay" style="display:none">
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des membres réservée aux administrateurs et au propriétaire.</div>
@@ -2260,7 +2261,7 @@ select{
   </div>
 
   <!-- ══ TIRAGE ══ -->
-  <div class="tab-panel" id="tab-tirage">
+  <div class="tab-panel" id="tab-tirage" style="display:none">
     <div id="tirage-locked" class="locked-overlay" style="display:none">
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Lancement du tirage réservé aux administrateurs et au propriétaire.</div>
@@ -2311,7 +2312,7 @@ select{
   </div>
 
   <!-- ══ CALENDRIER ══ (visible à tous) -->
-  <div class="tab-panel" id="tab-calendrier">
+  <div class="tab-panel" id="tab-calendrier" style="display:none">
     <div class="section">
       <div class="section-title">📅 Calendrier complet</div>
       <div class="cal-toolbar">
@@ -2324,7 +2325,7 @@ select{
   </div>
 
   <!-- ══ ÉCHANGE ══ -->
-  <div class="tab-panel" id="tab-echange">
+  <div class="tab-panel" id="tab-echange" style="display:none">
     <div id="echange-locked" class="locked-overlay" style="display:none">
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des échanges réservée aux administrateurs et au propriétaire.</div>
@@ -2370,7 +2371,7 @@ select{
   </div>
 
   <!-- ══ SANCTIONS & AMENDES ══ -->
-  <div class="tab-panel" id="tab-sanctions">
+  <div class="tab-panel" id="tab-sanctions" style="display:none">
 
     <!-- Amendes automatiques calculées -->
     <div style="background:var(--s1);border:1px solid var(--b1);border-radius:20px;padding:18px;margin-bottom:14px">
@@ -2479,7 +2480,7 @@ select{
   </div><!-- /tab-sanctions -->
 
   <!-- ══ CYCLES / SAISONS ══ -->
-  <div class="tab-panel" id="tab-saison2">
+  <div class="tab-panel" id="tab-saison2" style="display:none">
 
     <!-- SAUVEGARDE AUTOMATIQUE -->
     <div class="cycle-card active-cycle" style="border-color:rgba(59,130,246,.3);">
@@ -2583,7 +2584,7 @@ select{
 
   <!-- ══ GESTION (owner only) ══ -->
   <!-- ══ PROFIL MEMBRE ══ -->
-  <div class="tab-panel" id="tab-profil">
+  <div class="tab-panel" id="tab-profil" style="display:none">
     <div style="max-width:480px;margin:0 auto">
 
       <!-- Sélecteur membre -->
@@ -2610,7 +2611,7 @@ select{
     </div>
   </div>
 
-  <div class="tab-panel" id="tab-admin-panel">
+  <div class="tab-panel" id="tab-admin-panel" style="display:none">
     <div class="owner-section">
       <div class="owner-title">👑 Gestion des accès — Propriétaire</div>
 
@@ -2726,7 +2727,7 @@ select{
   </div>
 
   <!-- ══ TRAÇABILITÉ ══ -->
-  <div class="tab-panel" id="tab-tracabilite">
+  <div class="tab-panel" id="tab-tracabilite" style="display:none">
 
     <!-- TABS INTERNES -->
     <div style="display:flex;gap:4px;margin-bottom:16px;background:var(--s2);border-radius:10px;padding:4px;flex-wrap:wrap;">
@@ -3174,7 +3175,7 @@ select{
   </div><!-- /tab-tracabilite -->
 
   <!-- ══ TABLEAU DE BORD ══ -->
-  <div class="tab-panel" id="tab-dashboard">
+  <div class="tab-panel" id="tab-dashboard" style="display:none">
 
     <!-- ══ TITRE ══ -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
@@ -3404,7 +3405,7 @@ select{
   </div><!-- /tab-dashboard -->
 
   <!-- ══ NOTIFICATIONS ══ -->
-  <div class="tab-panel" id="tab-notifications">
+  <div class="tab-panel" id="tab-notifications" style="display:none">
 
     <!-- ══ DIAGNOSTIC (s'efface automatiquement) ══ -->
     <div id="diag-wrap" style="background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25);border-radius:12px;padding:12px 14px;margin-bottom:12px">
@@ -8650,15 +8651,16 @@ function startCountdown() {
 
 function switchTracTab(name, btn) {
   ['semaine','scores','alertes','retards','historique','benef'].forEach(t => {
-    const panel = document.getElementById(`trac-panel-${t}`);
+    const panel = document.getElementById('trac-panel-' + t);
     if (panel) panel.style.display = t === name ? 'block' : 'none';
-    const tb = document.getElementById(`trac-tab-${t}`);
+    const tb = document.getElementById('trac-tab-' + t);
     if (tb) tb.classList.toggle('active', t === name);
   });
   if (name === 'scores')     renderScores();
   if (name === 'alertes')    { renderAlertPanel(); renderAuditTrail(); updateNotifSettings(); }
   if (name === 'retards')    renderRetards();
   if (name === 'historique') renderTracHist();
+  if (name === 'semaine')    renderTracabilite();
 }
 
 // ═══════════════════════════════════════
@@ -11278,18 +11280,21 @@ applyRolePermissions();
 // ═══════════════════════════════════════
 
 function demarrerApp() {
-  // FORCER display:none sur tous les panels sauf home
+  // Cacher tous les panels au démarrage
   document.querySelectorAll('.tab-panel').forEach(p => {
     p.style.display = 'none';
     p.classList.remove('active');
   });
-  // Cacher aussi tous les sous-panels de tracabilite
   ['semaine','scores','alertes','retards','historique','benef'].forEach(t => {
-    const el = document.getElementById('trac-panel-' + t);
+    var el = document.getElementById('trac-panel-' + t);
     if (el) el.style.display = 'none';
   });
-  const homePanel = document.getElementById('tab-home');
-  if (homePanel) { homePanel.style.display = 'block'; homePanel.classList.add('active'); }
+  // Afficher uniquement l'accueil
+  var homePanel = document.getElementById('tab-home');
+  if (homePanel) {
+    homePanel.style.display = 'block';
+    homePanel.classList.add('active');
+  }
 
   // 1. Charger depuis localStorage immédiatement (affichage instantané)
   _loadFromLocal();
