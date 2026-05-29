@@ -9393,133 +9393,45 @@ function closeMoreMenu() {
 //  NAVIGATION — VERSION SIMPLE ET ROBUSTE
 // ═══════════════════════════════════════
 
+var ALL_TABS = ['home','membres','tirage','calendrier','echange','sanctions',
+                'saison2','profil','admin-panel','tracabilite','dashboard','notifications'];
 let _currentTab = 'home';
 
 function switchTab(name) {
   _currentTab = name;
-
-  // Cacher TOUS les panels
-  var panels = document.querySelectorAll('.tab-panel');
-  for (var i = 0; i < panels.length; i++) {
-    panels[i].style.display = 'none';
-    panels[i].classList.remove('active');
-  }
-
-  // Afficher LE panel demandé
+  ALL_TABS.forEach(function(t) {
+    var el = document.getElementById('tab-' + t);
+    if (el) el.style.display = 'none';
+  });
   var target = document.getElementById('tab-' + name);
-  if (target) {
-    target.style.display = 'block';
-    target.classList.add('active');
-  }
-
-  // Update desktop tabs
-  var dtabs = document.querySelectorAll('.tabs .tab');
-  for (var j = 0; j < dtabs.length; j++) {
-    var oc = dtabs[j].getAttribute('onclick') || '';
-    if (oc.indexOf("'" + name + "'") !== -1 || oc.indexOf('"' + name + '"') !== -1) {
-      dtabs[j].classList.add('active');
-    } else {
-      dtabs[j].classList.remove('active');
-    }
-  }
-
-  // Update bottom nav
-  var bnItems = document.querySelectorAll('.bn-item');
-  for (var k = 0; k < bnItems.length; k++) {
-    var oc2 = bnItems[k].getAttribute('onclick') || '';
-    if (oc2.indexOf("'" + name + "'") !== -1 || oc2.indexOf('"' + name + '"') !== -1) {
-      bnItems[k].classList.add('active');
-    } else {
-      bnItems[k].classList.remove('active');
-    }
-  }
-
-  // Scroll haut
+  if (target) target.style.display = 'block';
+  document.querySelectorAll('.tabs .tab').forEach(function(t) {
+    t.classList.toggle('active', (t.getAttribute('onclick')||'').indexOf("'" + name + "'") !== -1);
+  });
+  document.querySelectorAll('.bn-item').forEach(function(b) {
+    b.classList.toggle('active', (b.getAttribute('onclick')||'').indexOf("'" + name + "'") !== -1);
+  });
   window.scrollTo(0, 0);
-
-  // Fermer menu Plus
   try { closeMoreMenu(); } catch(e) {}
-
-  // Render contenu
   try {
     if (name === 'home')          renderHome();
-    if (name === 'tracabilite')   { renderTracabilite(); setTimeout(generateResumeMsg, 300); }
-    if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg, 300); }
+    if (name === 'tracabilite')   { switchTracTab('semaine'); renderTracabilite(); }
+    if (name === 'membres')       { switchMbTab('tirage'); }
+    if (name === 'notifications') { renderNotifications(); setTimeout(generateResumeMsg,200); }
     if (name === 'calendrier')    renderCalendar();
     if (name === 'dashboard')     renderDashboard();
     if (name === 'sanctions')     renderSanctions();
     if (name === 'saison2')       renderCycles();
-    if (name === 'membres')       renderDB();
     if (name === 'profil')        initProfilSelect();
   } catch(e) { console.warn('Render error:', e); }
 }
+function switchTabMobile(name, btn) { switchTab(name); }
+function switchTabFromMore(name)    { switchTab(name); }
+
 
 function switchTabMobile(name, btn) { switchTab(name); }
 function switchTabFromMore(name)    { switchTab(name); }
 
-function switchTab(name) {
-  if (_currentTab === name) return;
-  _currentTab = name;
-
-  // Cacher tous les panels
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-
-  // Afficher uniquement le panel demandé
-  const panel = document.getElementById('tab-' + name);
-  if (panel) panel.classList.add('active');
-
-  // Onglets desktop
-  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-  const dtBtn = document.querySelector('.tabs [onclick*="\'' + name + '\'"]') ||
-                document.querySelector('.tabs [onclick*="\"' + name + '\""]');
-  if (dtBtn) dtBtn.classList.add('active');
-
-  // Nav mobile
-  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-  const mbBtn = document.getElementById('bn-' + name) ||
-    document.querySelector('.bn-item[onclick*="' + name + '"]');
-  if (mbBtn) mbBtn.classList.add('active');
-
-  // Scroll haut + fermer Plus
-  window.scrollTo({top:0, behavior:'smooth'});
-  closeMoreMenu();
-
-  // Render du contenu
-  switch(name) {
-    case 'home':          renderHome();          break;
-    case 'tracabilite':
-      switchTracTab('semaine');
-      renderTracabilite();
-      break;
-    case 'membres':
-      switchMbTab('tirage');
-      renderDB();
-      break;
-    case 'notifications': renderNotifications(); setTimeout(generateResumeMsg,200); break;
-    case 'calendrier':    renderCalendar();      break;
-    case 'dashboard':     renderDashboard();     break;
-    case 'sanctions':     renderSanctions();     break;
-    case 'saison2':       renderCycles();        break;
-    case 'profil':        initProfilSelect();    break;
-  }
-
-  // Sous-titre header
-  const subs = {
-    home:          '35 membres · 200 $ CAD · Hebdomadaire',
-    membres:       'Fiches membres · Tirage · Import',
-    tracabilite:   'Suivi des cotisations · Scores · Alertes',
-    notifications: 'Messages WhatsApp · Rappels automatiques',
-    calendrier:    'Calendrier des 35 semaines',
-    echange:       'Échange de places entre membres',
-    dashboard:     'Statistiques · Finances · Graphiques',
-    sanctions:     'Amendes · Sanctions',
-    saison2:       'Cycles archivés',
-    profil:        'Profil individuel',
-    'admin-panel': 'Gestion des accès',
-  };
-  const sub = document.getElementById('header-sub');
-  if (sub && subs[name]) sub.textContent = subs[name];
-}
 
 // Aliases
 function switchTabMobile(name, btn) { switchTab(name); }
