@@ -1021,6 +1021,7 @@ select{
 .family-group{
   background:var(--s1);border:1px solid var(--b1);
   border-radius:var(--r-lg);overflow:hidden;margin-bottom:8px;
+  height:auto !important;min-height:50px;
 }
 .family-header{
   display:flex;align-items:center;gap:10px;padding:14px 16px;
@@ -6371,6 +6372,10 @@ function renderDB() {
 
   const box = document.getElementById('db-cards');
   if (!box) return;
+  box.style.minHeight = '400px';
+  box.style.height = 'auto';
+  box.style.overflow = 'visible';
+  box.style.display = 'block';
 
   // Bannière Interac manquant
   const interacStatus = getInteracStatus();
