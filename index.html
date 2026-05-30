@@ -427,8 +427,8 @@ h1{
 .b-late{ background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2); }
 .family-toggle{ color:var(--t3);font-size:10px;transition:transform .2s;margin-left:4px; }
 .family-toggle.open{ transform:rotate(180deg); }
-.tab-panel { display: none !important; padding: 16px; }
-.tab-panel.active { display: block !important; }
+.tab-panel { display: none !important; padding: 16px; overflow:visible; height:auto; }
+.tab-panel.active { display: block !important; overflow:visible !important; height:auto !important; }
 
 /* Sous-panels Suivi — cachés par défaut */
 #trac-panel-semaine, #trac-panel-scores, #trac-panel-alertes,
@@ -1914,9 +1914,9 @@ select{
 </div>
 
 <!-- ══════════════════════ MAIN APP ══════════════════════ -->
-<div id="main-app" style="display:block">
-<div style="width:100%;background:var(--bg);">
-<div class="container" style="width:100%;box-sizing:border-box;padding:0 0 120px;">
+<div id="main-app" style="display:block;overflow:visible;">
+<div style="width:100%;background:var(--bg);overflow:visible;">
+<div class="container" style="width:100%;box-sizing:border-box;padding:0 0 120px;overflow:visible;">
 
   <header>
     <div class="logo-tag">🏦 Tontine Officielle · Canada</div>
@@ -2113,62 +2113,21 @@ select{
 
   </div><!-- /tab-home -->
 
-  <div class="tab-panel" id="tab-membres" style="display:none;width:100%;box-sizing:border-box;padding:12px;">
+  <div class="tab-panel" id="tab-membres" style="display:none;width:100%;box-sizing:border-box;padding:12px;overflow:visible;height:auto;">
     <div id="membres-locked" class="locked-overlay" style="display:none">
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des membres réservée aux administrateurs et au propriétaire.</div>
     </div>
-    <div id="mb-panel-fiches" style="width:100%;box-sizing:border-box;">
-
-      <!-- ══ RECHERCHE AVANCÉE ══ -->
-
-      <!-- ── TIRAGE PANEL ── -->
-      <div id="mb-panel-tirage" style="display:none">
-        <div class="group-panels">
-          <div class="group-panel ancien-panel">
-            <div class="group-header">
-              <div class="group-title">⭐ Anciens membres</div>
-              <div class="group-count">Total : <b id="anc-count">0</b></div>
-            </div>
-            <div class="member-grid" id="grid-anc"></div>
-            <div class="btn-row">
-              <button class="btn btn-gold btn-sm" onclick="addMember('anc')">＋ Ajouter</button>
-              <button class="btn btn-outline btn-sm" onclick="saveMembers()">💾 Enregistrer</button>
-            </div>
-          </div>
-          <div class="group-panel nouveau-panel">
-            <div class="group-header">
-              <div class="group-title">🆕 Nouveaux membres</div>
-              <div class="group-count">Total : <b id="nouv-count" style="color:var(--nouveau)">0</b></div>
-            </div>
-            <div class="member-grid" id="grid-nouv"></div>
-            <div class="btn-row">
-              <button class="btn btn-blue btn-sm" onclick="addMember('nouv')">＋ Ajouter</button>
-              <button class="btn btn-outline-blue btn-sm" onclick="saveMembers()">💾 Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- ── FICHES MEMBRES ── -->
-      <div id="mb-panel-fiches" style="display:none">
+      <div id="mb-panel-fiches">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">Cliquer sur ✏️ pour modifier · 🗑️ pour supprimer</div>
           <button class="btn btn-gold btn-sm" id="db-add-btn" onclick="openModal()">＋ Nouvelle fiche</button>
         </div>
-        <!-- DB Stats -->
-        <div class="db-stats-bar" style="margin-bottom:14px">
-          <div class="db-stat"><div class="db-stat-val" id="dbs-total">0</div><div class="db-stat-lbl">Total fiches</div></div>
-          <div class="db-stat"><div class="db-stat-val" id="dbs-anc" style="color:var(--ancien)">0</div><div class="db-stat-lbl">Anciens</div></div>
-          <div class="db-stat"><div class="db-stat-val" id="dbs-nouv" style="color:var(--nouveau)">0</div><div class="db-stat-lbl">Nouveaux</div></div>
-          <div class="db-stat"><div class="db-stat-val" id="dbs-ok" style="color:var(--green)">0</div><div class="db-stat-lbl">À jour</div></div>
-        </div>
         <div id="interac-banner" style="display:none"></div>
         <div class="member-cards" id="db-cards">
           <div id="db-empty-state"></div>
-        </div>
-        <div class="btn-row" style="margin-top:14px">
-          <button class="btn btn-outline btn-sm" onclick="exportDBCSV()">⬇️ Export CSV</button>
         </div>
       </div>
 
