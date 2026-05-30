@@ -2089,12 +2089,6 @@ select{
     <div id="mb-panel-fiches">
 
       <!-- ══ RECHERCHE AVANCÉE ══ -->
-      <!-- SOUS-ONGLETS -->
-      <div style="display:flex;gap:4px;background:var(--dark4);border-radius:10px;padding:4px;margin-bottom:16px;">
-        <button class="tab" id="mb-tab-tirage" onclick="switchMbTab('tirage',this)" style="flex:1;font-size:12px">🎲 Tirage</button>
-        <button class="tab active" id="mb-tab-fiches" onclick="switchMbTab('fiches',this)" style="flex:1;font-size:12px">🗄️ Fiches membres</button>
-        <button class="tab" id="mb-tab-import" onclick="switchMbTab('import',this)" style="flex:1;font-size:12px">📋 Import/Export</button>
-      </div>
 
       <!-- ── TIRAGE PANEL ── -->
       <div id="mb-panel-tirage" style="display:none">
@@ -6362,19 +6356,10 @@ function renderDB() {
   var fichesPanel = document.getElementById('mb-panel-fiches');
   if (fichesPanel) fichesPanel.style.setProperty('display','block','important');
 
-  const q   = (document.getElementById('db-search')?.value || '').toLowerCase();
-  const fg  = document.getElementById('db-filter-groupe')?.value || '';
-  const fp  = document.getElementById('db-filter-paiement')?.value || '';
   const box = document.getElementById('db-cards');
   if (!box) return;
 
-  // Update stats
-  document.getElementById('dbs-total').textContent = memberDB.length;
-  document.getElementById('dbs-anc').textContent   = memberDB.filter(m=>m.groupe==='anc').length;
-  document.getElementById('dbs-nouv').textContent  = memberDB.filter(m=>m.groupe==='nouv').length;
-  document.getElementById('dbs-ok').textContent    = memberDB.filter(m=>m.paiement==='ok').length;
-
-  // ── Bannière Interac manquant ──
+  // Bannière Interac manquant
   const interacStatus = getInteracStatus();
   const interacBanner = document.getElementById('interac-banner');
   if (interacBanner) {
@@ -6387,22 +6372,13 @@ function renderDB() {
             <div style="font-weight:700;font-size:13px;color:var(--gold)">${interacStatus.sansInterac} membre${interacStatus.sansInterac>1?'s':''} sans numéro Interac</div>
             <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px">${interacStatus.membres.slice(0,5).join(' · ')}${interacStatus.membres.length>5?` · +${interacStatus.membres.length-5} autres`:''}</div>
           </div>
-          <button class="btn btn-gold btn-sm" onclick="filtrerSansInterac()">Voir tous</button>
         </div>`;
-    } else if (memberDB.length > 0) {
-      interacBanner.innerHTML = `<div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green)">✅ Tous les membres ont un numéro Interac enregistré !</div>`;
-      interacBanner.style.display = 'block';
     } else {
       interacBanner.style.display = 'none';
     }
   }
 
-  let filtered = memberDB.filter(m => {
-    const matchQ = !q  || m.nom.toLowerCase().includes(q)||(m.tel||'').includes(q)||(m.email||'').toLowerCase().includes(q)||(m.numero||'').toLowerCase().includes(q);
-    const matchG = !fg || m.groupe===fg;
-    const matchP = !fp || m.paiement===fp;
-    return matchQ && matchG && matchP;
-  });
+  const filtered = memberDB;
 
   if (!filtered.length) {
     box.innerHTML = `<div class="empty-state"><div class="empty-icon">${memberDB.length?'🔍':'🗄️'}</div><p>${memberDB.length?'Aucun résultat.':'Aucune fiche enregistrée.<br>Clique sur <b>+ Nouvelle fiche</b>.'}</p></div>`;
