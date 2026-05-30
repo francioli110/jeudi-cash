@@ -389,6 +389,9 @@ h1{
 /* ── ONGLETS ── */
 #db-cards { width:100%; box-sizing:border-box; }
 .family-group { width:100%; box-sizing:border-box; margin-bottom:12px; }
+#mb-panel-fiches { min-height:100px; height:auto !important; position:relative; }
+#tab-membres { height:auto !important; min-height:200px; }
+.tab-panel.active { display:block !important; height:auto !important; min-height:100px; }
 .tab-panel { display: none !important; padding: 16px; }
 .tab-panel.active { display: block !important; }
 
@@ -6357,9 +6360,14 @@ function deleteMemberDB(id) {
 }
 
 function renderDB() {
-  // Forcer l'affichage du panel fiches
+  // Forcer l'affichage et la hauteur du panel fiches
   var fichesPanel = document.getElementById('mb-panel-fiches');
-  if (fichesPanel) fichesPanel.style.setProperty('display','block','important');
+  if (fichesPanel) {
+    fichesPanel.style.setProperty('display','block','important');
+    fichesPanel.style.minHeight = '200px';
+    fichesPanel.style.height = 'auto';
+    fichesPanel.style.position = 'relative';
+  }
 
   const box = document.getElementById('db-cards');
   if (!box) return;
