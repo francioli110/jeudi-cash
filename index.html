@@ -233,7 +233,7 @@ body::before{
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    LAYOUT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.container{max-width:600px;margin:0 auto;padding:0 0 120px;}
+.container{width:100%;max-width:100%;margin:0;padding:0 0 120px;box-sizing:border-box;}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    HEADER
@@ -399,7 +399,7 @@ h1{
 
 /* Sous-panels Membres — cachés par défaut */
 #mb-panel-tirage, #mb-panel-fiches, #mb-panel-import {
-  display: none !important;
+  display: none;
 }
 .mb-panel-visible { display: block !important; }
 @keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -1884,7 +1884,7 @@ select{
 <!-- ══════════════════════ MAIN APP ══════════════════════ -->
 <div id="main-app" style="display:block">
 <div style="width:100%;background:var(--bg);">
-<div class="container">
+<div class="container" style="max-width:100%;margin:0;padding:0 0 120px;box-sizing:border-box;">
 
   <header>
     <div class="logo-tag">🏦 Tontine Officielle · Canada</div>
@@ -2086,7 +2086,7 @@ select{
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des membres réservée aux administrateurs et au propriétaire.</div>
     </div>
-    <div id="mb-panel-fiches" style="display:none">
+    <div id="mb-panel-fiches">
 
       <!-- ══ RECHERCHE AVANCÉE ══ -->
       <div id="search-box" style="background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;margin-bottom:16px;">
@@ -5755,21 +5755,34 @@ function exportPDF() {
   const buildRows = (g) => {
     const schedule = Array.isArray(G[g].schedule) ? G[g].schedule : Object.values(G[g].schedule||{});
     const drawn    = Array.isArray(G[g].drawn)    ? G[g].drawn    : Object.values(G[g].drawn||{});
-    return schedule.map(s => {
-      const d   = s.iso ? new Date(s.iso) : null;
-      const isD = s.idx !== null && s.idx !== undefined && drawn.includes(s.idx);
+    const members  = (Array.isArray(G[g].members) ? G[g].members  : Object.values(G[g].members||{})).filter(n=>n);
+    const ancLen   = (Array.isArray(G.anc.members) ? G.anc.members : Object.values(G.anc.members||{})).filter(n=>n).length;
+    const offset   = g === 'nouv' ? ancLen : 0;
+
+    return schedule.map((s, i) => {
+      // Résoudre le nom : schedule.name OU members[drawn[i]]
+      let name = s.name || null;
+      if (!name && i < drawn.length) {
+        const memberIdx = Number(drawn[i]);
+        if (!isNaN(memberIdx) && memberIdx < members.length) {
+          name = members[memberIdx] || null;
+        }
+      }
+      const weekNum = s.week || (offset + i + 1);
+      const d   = s.iso ? new Date(s.iso.substring(0,10)+'T12:00:00') : null;
+      const isD = i < drawn.length;
       const todayMid = new Date(today); todayMid.setHours(0,0,0,0);
       const dMid = d ? new Date(d) : null; if(dMid) dMid.setHours(0,0,0,0);
       const isPast = dMid && dMid <= todayMid;
-      const confirmed = receptionsHist.find(r =>
-        r.weekNum === s.week &&
-        (r.benefName === s.name || r.benefName?.trim() === s.name?.trim())
-      );
+      const confirmed = name ? receptionsHist.find(r =>
+        r.weekNum === weekNum &&
+        (r.benefName === name || r.benefName?.trim() === name?.trim())
+      ) : null;
       let statut='À venir', color='#444', bg='transparent', icon='';
       if (isD && confirmed)   { statut='✅ BOUFFÉ';      color='#00C896'; bg='rgba(0,200,150,.08)'; icon='✅'; }
       else if (isD && isPast) { statut='Tiré · Passé';   color='#00C896'; bg='rgba(16,185,129,.05)'; icon='✓'; }
       else if (isD && !isPast){ statut='⏳ En attente';  color='#F0B429'; bg='rgba(240,180,41,.06)'; icon='⏳'; }
-      return { week:s.week, date:s.date||'—', name:s.name||'—', groupe:g, montant:isD?potDuBenefStr(s.name):'—', nbCotis:isD?nbCotisants(s.name):'—', statut, color, bg, icon, confirmed, isD, isPast };
+      return { week:weekNum, date:s.date||'—', name:name||'—', groupe:g, montant:isD&&name?potDuBenefStr(name):'—', nbCotis:isD&&name?nbCotisants(name):'—', statut, color, bg, icon, confirmed, isD, isPast };
     });
   };
 
@@ -6428,6 +6441,10 @@ function deleteMemberDB(id) {
 }
 
 function renderDB() {
+  // Forcer l'affichage du panel fiches
+  var fichesPanel = document.getElementById('mb-panel-fiches');
+  if (fichesPanel) fichesPanel.style.setProperty('display','block','important');
+
   const q   = (document.getElementById('db-search')?.value || '').toLowerCase();
   const fg  = document.getElementById('db-filter-groupe')?.value || '';
   const fp  = document.getElementById('db-filter-paiement')?.value || '';
@@ -8679,6 +8696,7 @@ function switchTracTab(name, btn) {
     const panel = document.getElementById('trac-panel-' + t);
     if (panel) {
       panel.classList.toggle('trac-panel-visible', t === name);
+      panel.style.display = t === name ? 'block' : 'none';
     }
     const tb = document.getElementById('trac-tab-' + t);
     if (tb) tb.classList.toggle('active', t === name);
@@ -9466,10 +9484,12 @@ function switchTab(name) {
     if (name === 'home')          renderHome();
     if (name === 'tracabilite')   { switchTracTab('semaine'); renderTracabilite(); }
     if (name === 'membres') {
-      // Montrer directement mb-panel-fiches via classe CSS
       ['tirage','fiches','import'].forEach(function(t) {
         var p = document.getElementById('mb-panel-' + t);
-        if (p) p.classList.toggle('mb-panel-visible', t === 'fiches');
+        if (p) {
+          p.classList.toggle('mb-panel-visible', t === 'fiches');
+          p.style.display = t === 'fiches' ? 'block' : 'none';
+        }
       });
       renderDB();
     }
@@ -9796,7 +9816,10 @@ function onGlobalSearch() {
 function switchMbTab(name, btn) {
   ['tirage','fiches','import'].forEach(t => {
     const panel = document.getElementById('mb-panel-' + t);
-    if (panel) panel.classList.toggle('mb-panel-visible', t === name);
+    if (panel) {
+      panel.classList.toggle('mb-panel-visible', t === name);
+      panel.style.display = t === name ? 'block' : 'none';
+    }
     const tb = document.getElementById('mb-tab-' + t);
     if (tb) tb.classList.toggle('active', t === name);
   });
