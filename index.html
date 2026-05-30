@@ -5767,6 +5767,11 @@ function exportPDF() {
     const ancLen   = (Array.isArray(G.anc.members) ? G.anc.members : Object.values(G.anc.members||{})).filter(n=>n).length;
     const offset   = g === 'nouv' ? ancLen : 0;
 
+    console.log(`PDF buildRows(${g}): schedule=${schedule.length}, drawn=${drawn.length}, members=${members.length}`);
+    if (members.length && drawn.length) {
+      console.log(`  Ex: drawn[3]=${drawn[3]} → ${members[Number(drawn[3])]}`);
+    }
+
     return schedule.map((s, i) => {
       // Résoudre le nom : schedule.name OU members[drawn[i]]
       let name = s.name || null;
