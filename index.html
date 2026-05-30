@@ -387,8 +387,21 @@ h1{
    TAB PANELS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* ── ONGLETS ── */
-.tab-panel { display: none; padding: 16px; }
-.tab-panel.active { display: block; }
+.tab-panel { display: none !important; padding: 16px; }
+.tab-panel.active { display: block !important; }
+
+/* Sous-panels Suivi — cachés par défaut */
+#trac-panel-semaine, #trac-panel-scores, #trac-panel-alertes,
+#trac-panel-retards, #trac-panel-historique, #trac-panel-benef {
+  display: none !important;
+}
+.trac-panel-visible { display: block !important; }
+
+/* Sous-panels Membres — cachés par défaut */
+#mb-panel-tirage, #mb-panel-fiches, #mb-panel-import {
+  display: none !important;
+}
+.mb-panel-visible { display: block !important; }
 @keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -8664,7 +8677,9 @@ function startCountdown() {
 function switchTracTab(name, btn) {
   ['semaine','scores','alertes','retards','historique','benef'].forEach(t => {
     const panel = document.getElementById('trac-panel-' + t);
-    if (panel) panel.style.display = t === name ? 'block' : 'none';
+    if (panel) {
+      panel.classList.toggle('trac-panel-visible', t === name);
+    }
     const tb = document.getElementById('trac-tab-' + t);
     if (tb) tb.classList.toggle('active', t === name);
   });
@@ -9413,18 +9428,22 @@ let _currentTab = 'home';
 function switchTab(name) {
   _currentTab = name;
 
-  // Cacher TOUS les onglets
+  // Retirer la classe active de tous les panels
   ALL_TABS.forEach(function(t) {
     var el = document.getElementById('tab-' + t);
-    if (el) el.style.display = 'none';
+    if (el) {
+      el.classList.remove('active');
+      el.style.display = ''; // Reset inline style
+    }
   });
 
-  // Afficher seulement celui demandé
+  // Ajouter active uniquement au panel demandé
   var target = document.getElementById('tab-' + name);
   if (target) {
-    target.style.display = 'block';
+    target.classList.add('active');
   } else {
     console.warn('Tab not found: tab-' + name);
+    return;
   }
 
   // Nav desktop
@@ -9447,10 +9466,10 @@ function switchTab(name) {
     if (name === 'home')          renderHome();
     if (name === 'tracabilite')   { switchTracTab('semaine'); renderTracabilite(); }
     if (name === 'membres') {
-      // Montrer directement mb-panel-fiches
+      // Montrer directement mb-panel-fiches via classe CSS
       ['tirage','fiches','import'].forEach(function(t) {
         var p = document.getElementById('mb-panel-' + t);
-        if (p) p.style.display = t === 'fiches' ? 'block' : 'none';
+        if (p) p.classList.toggle('mb-panel-visible', t === 'fiches');
       });
       renderDB();
     }
@@ -9777,13 +9796,11 @@ function onGlobalSearch() {
 function switchMbTab(name, btn) {
   ['tirage','fiches','import'].forEach(t => {
     const panel = document.getElementById('mb-panel-' + t);
-    if (panel) panel.style.display = t === name ? 'block' : 'none';
+    if (panel) panel.classList.toggle('mb-panel-visible', t === name);
     const tb = document.getElementById('mb-tab-' + t);
     if (tb) tb.classList.toggle('active', t === name);
   });
-  if (name === 'fiches') {
-    setTimeout(function() { renderDB(); }, 50);
-  }
+  if (name === 'fiches') setTimeout(function() { renderDB(); }, 50);
 }
 
 function renderDashboard() {
@@ -11247,10 +11264,7 @@ applyRolePermissions();
 
 function demarrerApp() {
   // Cacher tous les panels au démarrage
-  document.querySelectorAll('.tab-panel').forEach(p => {
-    p.style.display = 'none';
-    p.classList.remove('active');
-  });
+  document.querySelectorAll(".tab-panel").forEach(function(p) { p.classList.remove("active"); p.style.display = ""; });
   ['semaine','scores','alertes','retards','historique','benef'].forEach(t => {
     var el = document.getElementById('trac-panel-' + t);
     if (el) el.style.display = 'none';
@@ -11258,7 +11272,6 @@ function demarrerApp() {
   // Afficher uniquement l'accueil
   var homePanel = document.getElementById('tab-home');
   if (homePanel) {
-    homePanel.style.display = 'block';
     homePanel.classList.add('active');
   }
 
