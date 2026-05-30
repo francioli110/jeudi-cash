@@ -387,6 +387,8 @@ h1{
    TAB PANELS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* ── ONGLETS ── */
+#db-cards { width:100%; box-sizing:border-box; }
+.family-group { width:100%; box-sizing:border-box; margin-bottom:12px; }
 .tab-panel { display: none !important; padding: 16px; }
 .tab-panel.active { display: block !important; }
 
@@ -1445,7 +1447,10 @@ select{
   .stats{ max-width:900px !important;margin:0 auto !important;grid-template-columns:repeat(5,1fr) !important; }
   #cfg-bar{ max-width:900px !important;margin:0 auto !important;padding-left:28px !important;padding-right:28px !important; }
   .tabs{ max-width:900px !important;margin:0 auto !important;padding:0 20px !important; }
-  .container{ max-width:900px !important;margin:0 auto !important;padding:20px 28px 40px !important; }
+  .container{ max-width:900px !important;margin:0 auto !important;padding:20px 28px 40px !important;overflow:visible !important; }
+  .tab-panel{ width:100% !important;box-sizing:border-box !important;overflow:visible !important; }
+  #mb-panel-fiches{ width:100% !important;min-height:100px;overflow:visible !important; }
+  #db-cards{ width:100% !important;overflow:visible !important; }
   #shortcut-bar{ max-width:900px !important;margin:0 auto !important; }
   .tab-panel{ padding:18px 0 !important; }
   #tab-home{ max-width:680px !important; }
@@ -2081,12 +2086,12 @@ select{
 
   </div><!-- /tab-home -->
 
-  <div class="tab-panel" id="tab-membres" style="display:none">
+  <div class="tab-panel" id="tab-membres" style="display:none;width:100%;box-sizing:border-box;padding:12px;">
     <div id="membres-locked" class="locked-overlay" style="display:none">
       <div class="locked-icon">🔒</div>
       <div class="locked-text">Gestion des membres réservée aux administrateurs et au propriétaire.</div>
     </div>
-    <div id="mb-panel-fiches">
+    <div id="mb-panel-fiches" style="width:100%;box-sizing:border-box;">
 
       <!-- ══ RECHERCHE AVANCÉE ══ -->
 
