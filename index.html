@@ -397,8 +397,8 @@ h1{
 }
 .trac-panel-visible { display: block !important; }
 
-/* Sous-panels Membres — cachés par défaut */
-#mb-panel-tirage, #mb-panel-fiches, #mb-panel-import {
+/* Sous-panels Membres — tirage et import cachés par défaut, fiches visible */
+#mb-panel-tirage, #mb-panel-import {
   display: none;
 }
 .mb-panel-visible { display: block !important; }
@@ -2187,8 +2187,8 @@ select{
 
       <!-- SOUS-ONGLETS -->
       <div style="display:flex;gap:4px;background:var(--dark4);border-radius:10px;padding:4px;margin-bottom:16px;">
-        <button class="tab active" id="mb-tab-tirage" onclick="switchMbTab('tirage',this)" style="flex:1;font-size:12px">🎲 Tirage</button>
-        <button class="tab" id="mb-tab-fiches" onclick="switchMbTab('fiches',this)" style="flex:1;font-size:12px">🗄️ Fiches membres</button>
+        <button class="tab" id="mb-tab-tirage" onclick="switchMbTab('tirage',this)" style="flex:1;font-size:12px">🎲 Tirage</button>
+        <button class="tab active" id="mb-tab-fiches" onclick="switchMbTab('fiches',this)" style="flex:1;font-size:12px">🗄️ Fiches membres</button>
         <button class="tab" id="mb-tab-import" onclick="switchMbTab('import',this)" style="flex:1;font-size:12px">📋 Import/Export</button>
       </div>
 
@@ -5737,6 +5737,14 @@ function exportCSV(){
 }
 
 function exportPDF() {
+  // Forcer chargement depuis localStorage si données manquantes
+  if (!G.anc.members.length)  G.anc.members  = JSON.parse(localStorage.getItem('jc2_anc_members')||'[]').filter(n=>n);
+  if (!G.anc.drawn.length)    G.anc.drawn    = JSON.parse(localStorage.getItem('jc2_anc_drawn')||'[]');
+  if (!G.anc.schedule.length) G.anc.schedule = JSON.parse(localStorage.getItem('jc2_anc_schedule')||'[]');
+  if (!G.nouv.members.length) G.nouv.members = JSON.parse(localStorage.getItem('jc2_nouv_members')||'[]').filter(n=>n);
+  if (!G.nouv.drawn.length)   G.nouv.drawn   = JSON.parse(localStorage.getItem('jc2_nouv_drawn')||'[]');
+  if (!G.nouv.schedule.length)G.nouv.schedule= JSON.parse(localStorage.getItem('jc2_nouv_schedule')||'[]');
+
   const today    = new Date();
   const genDate  = today.toLocaleDateString('fr-CA', {day:'2-digit', month:'long', year:'numeric'});
   const genTime  = today.toLocaleTimeString('fr-CA', {hour:'2-digit', minute:'2-digit'});
