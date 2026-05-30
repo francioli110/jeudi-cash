@@ -6380,6 +6380,19 @@ function renderDB() {
 
   const filtered = memberDB;
 
+  // Si memberDB vide, créer les fiches depuis la liste des membres
+  if (!filtered.length && (G.anc.members.length || G.nouv.members.length)) {
+    const anc  = (Array.isArray(G.anc.members)  ? G.anc.members  : Object.values(G.anc.members||{})).filter(n=>n);
+    const nouv = (Array.isArray(G.nouv.members) ? G.nouv.members : Object.values(G.nouv.members||{})).filter(n=>n);
+    memberDB = [
+      ...anc.map((nom,i)  => ({id:i+1,          nom, groupe:'anc',  numero:'JC-'+String(i+1).padStart(3,'0'),          tel:'', interac:'', email:'', paiement:'ok', adhesion:'2026-05-06'})),
+      ...nouv.map((nom,i) => ({id:anc.length+i+1, nom, groupe:'nouv', numero:'JC-'+String(anc.length+i+1).padStart(3,'0'), tel:'', interac:'', email:'', paiement:'ok', adhesion:'2026-05-06'}))
+    ];
+    localStorage.setItem('jc2_memberdb', JSON.stringify(memberDB));
+    // Sauvegarder dans Firebase en arrière-plan
+    if (db) db.ref('jeudi_cash/jc2_memberdb').set(memberDB).catch(()=>{});
+  }
+
   if (!filtered.length) {
     box.innerHTML = `<div class="empty-state"><div class="empty-icon">${memberDB.length?'🔍':'🗄️'}</div><p>${memberDB.length?'Aucun résultat.':'Aucune fiche enregistrée.<br>Clique sur <b>+ Nouvelle fiche</b>.'}</p></div>`;
     return;
